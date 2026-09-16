@@ -1,0 +1,12 @@
+Integrantes: González Agustina, Escobar Tomas, Gomez Omar, Molinas Adrian
+
+Proyecto: SIGAM - Sistema de Gestión y Asignación de Auxilio Mecánico
+
+Introducción:
+SIGAM es un sistema que busca centralizar y automatizar la gestión de servicios de asistencia mecánica, resolviendo problemas de coordinación, asignación y seguimiento.
+
+El sistema segmenta el acceso en 4 roles (Administrador, Soporte, Chofer y Cliente) e integra un motor de búsqueda y asignación automática basado en compatibilidad vehicular, niveles de urgencia y cálculo de distancias. Además un área de Soporte para atender y resolver incidencias reportadas por los choferes/clientes. 
+
+SIGAM busca reducir los tiempos de demora en la prestación de asistencia mecánica y, a su vez, generar nuevas oportunidades laborales, permitiendo que aquellas personas que dispongan de un vehículo que cumpla con determinadas características y requisitos puedan incorporarse como prestadores del servicio.
+
+
