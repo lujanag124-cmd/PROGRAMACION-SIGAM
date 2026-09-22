@@ -16,8 +16,14 @@
 #define CHOFER_ASIGNADO 2
 #define VIAJE_INICIADO 3
 #define VIAJE_FINALIZADO 4
+#define LOGIN_INCORRECTO 0
+#define PERFIL_CLIENTE 1
+#define PERFIL_CHOFER 2
+#define PERFIL_ADMIN 3
+#define PERFIL_SOPORTE 4
 //Definicion de las estructuras de los perfiles
 typedef struct{
+    int idChofer;
     char usuario[TEXTO];
     char clave[TEXTO];
 }chofer_t;
@@ -45,13 +51,13 @@ typedef struct{
     int tipoVehiculo;
     int estado;
     int choferAsignado;
-}solicitud_t;
+}solicitudes_t;
 
 //Declaracion de los prototipos
 void mostrarBienvenida();
 void inicioSesion(char usuario[], char password[]);
-char validaLogin (char usuario[], char password[],chofer_t chofer[],cliente_t cliente[],admin_t admin[],soporte_t soporte[],int *choferLogueado, int *clienteLogueado);
-void menuCliente();
+int validaLogin (char usuario[], char password[],chofer_t chofer[],cliente_t cliente[],admin_t admin[],soporte_t soporte[],int *choferLogueado, int *clienteLogueado);
+void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]);
 void menuChofer();
 void menuAdmin();
 void menuSoporte();
@@ -63,16 +69,19 @@ int main() {
     cliente_t cliente[CANT_CLIENTES];
     admin_t admin[CANT_ADMIN];
     soporte_t soporte[CANT_SOPORTE];
-    solicitud_t solicitudes[CANT_SOLICITUDES];
+    solicitudes_t solicitudes[CANT_SOLICITUDES];
 
     //Credenciales hardcodeadas
     //strcpy() viene de <string.h> copia una cadena dentro de un campo char[] de la estructura
+    chofer[0].idChofer = 0;
     strcpy(chofer[0].usuario, "chofer1");
     strcpy(chofer[0].clave,"chofer123");
 
+    chofer[1].idChofer = 1;
     strcpy(chofer[1].usuario, "chofer2");
     strcpy(chofer[1].clave,"chofer123");
 
+    chofer[2].idChofer = 2;
     strcpy(chofer[2].usuario, "chofer3");
     strcpy(chofer[2].clave,"chofer123");
     //--------------------------------------------
@@ -96,62 +105,81 @@ int main() {
     
 
     char usuario[50], password[50];
-    char tipoUsuario, valorUsuario;
+    int tipoUsuario, valorUsuario;
     int choferLogueado = -1, clienteLogueado = -1;
+    int i;
+    //Realiza el conteo de clientes y asu vez los asigna sin solicitud y sin chofer
+    for (i=0; i<CANT_CLIENTES; i++){
+        solicitudes[i].idCliente = i ;
+        solicitudes[i].estado = SIN_SOLICITUD;
+        solicitudes[i].choferAsignado = -1;
 
+    }
     //system("pause"); equivalente a esperar tecla
     //system("cls"); equivalente a limpiar pantalla
     //Sleep(3000); // 3 segundos   este es para esperar X segundos, se escribe en milisegundos
  
-    valorUsuario='I';
+    valorUsuario=LOGIN_INCORRECTO;
+    int continuar = 1 ;
+    while (continuar == 1) //--------Para poder inicializar con otro perfil y/o salir del programa en su defecto.
+    {
 
-    while(valorUsuario=='I'){ 
-        system("cls");
-        //system("cls"); equivalente a limpiar pantalla
-        mostrarBienvenida();
-
-        // Inicio de sesión
-        inicioSesion(usuario, password);
-
-        //Validacion para credenciales incorrectas en login
-        valorUsuario=validaLogin(usuario,password,chofer,cliente,admin,soporte,&choferLogueado,&clienteLogueado);
-        
-        if (valorUsuario=='I'){
-            printf("Usuario o clave incorrecta. Por favor, intente nuevamente.\n");
-            Sleep(2500);
+        while(valorUsuario==LOGIN_INCORRECTO){ 
             system("cls");
-        }
-    }
-    switch (valorUsuario){
-        case 'H':
-            printf("Inicio de sesion correcto.\n");
-            printf("Perfil: Chofer\n");
-            Sleep(1500);
-            menuChofer();
-            break;
-        case 'C':
-            printf("Inicio de sesion correcto.\n");
-            printf("Perfil: Cliente. ID : %d\n", cliente[clienteLogueado].idCliente);
-            Sleep(1500);
-            menuCliente();
-            break;
-        case 'A':
-            printf("Inicio de sesion correcto.\n");
-            printf("Perfil: Admin\n");
-            Sleep(1500);
-            menuAdmin();
-            break;
-        case 'S':
-            printf("Inicio de sesion correcto.\n");
-            printf("Perfil: Soporte\n");
-            menuSoporte();
-            break;
-        default:
-            printf("Error inesperado al identificar el perfil.\n");
-            break;
-      }
+            //system("cls"); equivalente a limpiar pantalla
+            mostrarBienvenida();
 
-  return 0;
+            // Inicio de sesión
+            inicioSesion(usuario, password);
+
+            //Validacion para credenciales incorrectas en login
+            valorUsuario=validaLogin(usuario,password,chofer,cliente,admin,soporte,&choferLogueado,&clienteLogueado);
+            
+            if (valorUsuario==LOGIN_INCORRECTO){
+                printf("Usuario o clave incorrecta. Por favor, intente nuevamente.\n");
+                Sleep(2500);
+                system("cls");
+            }
+        }
+        switch (valorUsuario)
+        {
+            case PERFIL_CHOFER:
+                printf("Inicio de sesion correcto.\n");
+                printf("Perfil: Chofer ID : %d\n",chofer[choferLogueado].idChofer);
+                Sleep(2500);
+                menuChofer();
+                break;
+            case PERFIL_CLIENTE:
+                printf("Inicio de sesion correcto.\n");
+                printf("Perfil: Cliente. ID : %d\n", cliente[clienteLogueado].idCliente);
+                Sleep(2500);
+                menuCliente(clienteLogueado,solicitudes);   
+                break;
+            case PERFIL_ADMIN:
+                printf("Inicio de sesion correcto.\n");
+                printf("Perfil: Admin\n");
+                Sleep(1500);
+                menuAdmin();
+                break;
+            case PERFIL_SOPORTE:
+                printf("Inicio de sesion correcto.\n");
+                printf("Perfil: Soporte\n");
+                menuSoporte();
+                break;
+            default:
+                printf("Error inesperado al identificar el perfil.\n");
+                break;
+        }
+        printf("Desea volver a iniciar sesion?\n");
+        printf("1- SI\n");
+        printf("0- NO, cerrar SIGAM\n");
+        scanf("%d", &continuar); 
+       
+        valorUsuario=LOGIN_INCORRECTO;
+        choferLogueado = -1;
+        clienteLogueado = -1;
+    }
+    return 0;
 }
 
 void mostrarBienvenida() {
@@ -170,47 +198,47 @@ void inicioSesion(char usuario[], char password[]) {
     printf("Ingrese su clave: ");
     scanf("%s", password);
 }
-//Aclaraciones: la funcion devuelve una letra porque la comparacion entre cadenas no es igual que en pseint. 
-//strcmp sirve para comparar dos strings.
+//Aclaraciones:La funcion devuelve una constante que identifica el perfil.
+// PERFIL_CLIENTE, PERFIL_CHOFER, PERFIL_ADMIN o PERFIL_SOPORTE.
+//strcmp() compara dos cadenas y devuelve 0 cuando son iguales.
 // usuario y password se comparan sin [] porque eso devolveria una sola letra justamente por lo dicho arriba 
 //Incorpore clienteLogueado asi tambien sabemos que cliente es
-//choferes devuelve H asi no se pisa con clientes que tambien devolveria C
-char validaLogin(char usuario[], char password[],chofer_t chofer[],cliente_t cliente[],admin_t admin[],soporte_t soporte[],int *choferLogueado, int *clienteLogueado){
+int validaLogin(char usuario[], char password[],chofer_t chofer[],cliente_t cliente[],admin_t admin[],soporte_t soporte[],int *choferLogueado, int *clienteLogueado){
     int i=0;
-    char tipoUsuario='I';
+    int tipoUsuario=LOGIN_INCORRECTO;
     
-    while (i<CANT_CHOFERES && tipoUsuario == 'I'){
+    while (i<CANT_CHOFERES && tipoUsuario == LOGIN_INCORRECTO){
         if(strcmp(usuario, chofer[i].usuario)==0 && strcmp(password,chofer[i].clave)==0){
-            tipoUsuario= 'H';
+            tipoUsuario= PERFIL_CHOFER;
             *choferLogueado=i;
         }
         i++;
     }
     i=0;
-    while (i<CANT_CLIENTES && tipoUsuario== 'I'){
+    while (i<CANT_CLIENTES && tipoUsuario== LOGIN_INCORRECTO){
         if(strcmp(usuario, cliente[i].usuario)==0 && strcmp(password,cliente[i].clave)==0){
-            tipoUsuario= 'C';
+            tipoUsuario= PERFIL_CLIENTE;
             *clienteLogueado=i;
         }
         i++;
     }
     i=0;
-    while (i<CANT_ADMIN && tipoUsuario== 'I'){
+    while (i<CANT_ADMIN && tipoUsuario== LOGIN_INCORRECTO){
         if(strcmp(usuario, admin[i].usuario)==0 && strcmp(password,admin[i].clave)==0){
-            tipoUsuario= 'A';
+            tipoUsuario= PERFIL_ADMIN;
         }
         i++;
     }
     i=0;
-    while (i<CANT_SOPORTE && tipoUsuario== 'I'){
+    while (i<CANT_SOPORTE && tipoUsuario== LOGIN_INCORRECTO){
         if(strcmp(usuario, soporte[i].usuario)==0 && strcmp(password,soporte[i].clave)==0){
-            tipoUsuario= 'S';
+            tipoUsuario= PERFIL_SOPORTE;
         }
         i++;
     }
     return tipoUsuario;
 } 
-void menuCliente() {
+void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
     int opcion=-1;
     while (opcion != 0){
         system("cls");
