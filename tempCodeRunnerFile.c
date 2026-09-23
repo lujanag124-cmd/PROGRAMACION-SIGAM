@@ -27,9 +27,6 @@
 #define UBICACION_MERLO 1
 #define UBICACION_ITUZAINGO 2
 #define UBICACION_MORON 3
-#define SITUACION_PINCHADURA 1
-#define SITUACION_FALLA_MECANICA 2
-#define SITUACION_ACCIDENTE 3
 //Definicion de las estructuras de los perfiles
 typedef struct{
     int idChofer;
@@ -59,7 +56,6 @@ typedef struct{
     int ubicacion;
     char patente[TEXTO];
     int tipoVehiculo;
-    int situacion;
     int estado;
     int choferAsignado;
 }solicitudes_t;
@@ -73,7 +69,6 @@ void menuChofer();
 void menuAdmin();
 void menuSoporte();
 void registrarSolicitud(int clienteLogueado,solicitudes_t solicitudes[]);
-void mostrarResumenSolicitud(int clienteLogueado,solicitudes_t solicitudes[]);
 //Inicio del algoritmo
 int main() { 
     
@@ -184,14 +179,11 @@ int main() {
                 break;
         }
         system("cls");
-        do{
         printf("Desea volver a iniciar sesion?\n");
         printf("1- SI\n");
         printf("0- NO, quiero cerrar SIGAM\n");
-        printf("Opcion: ");
         scanf("%d", &continuar); 
-        system("cls");
-        }while (continuar < 0 || continuar > 1);
+       
         valorUsuario=LOGIN_INCORRECTO;
         choferLogueado = -1;
         clienteLogueado = -1;
@@ -257,7 +249,7 @@ int validaLogin(char usuario[], char password[],chofer_t chofer[],cliente_t clie
 } 
 void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
     int opcion=-1;
-    while (opcion != 6){
+    while (opcion != 0){
         system("cls");
         printf("====================================================\n");
         printf("                  MENU CLIENTE                      \n");
@@ -281,8 +273,6 @@ void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
 
             case 2:
                 printf("Seleccionaste: Consultar estado de la solicitud\n");
-                system("cls");
-                mostrarResumenSolicitud(clienteLogueado,solicitudes);
                 system("pause");
                 break;
 
@@ -316,6 +306,7 @@ void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
 
 void registrarSolicitud(int clienteLogueado,solicitudes_t solicitudes[]){   
     int confirmar;
+    int ubicacion;
     if (solicitudes[clienteLogueado].estado == SIN_SOLICITUD)
             {
                 confirmar = 2;
@@ -323,52 +314,71 @@ void registrarSolicitud(int clienteLogueado,solicitudes_t solicitudes[]){
                 {
                     system("cls");
                     printf("Seleccionaste: Solicitar auxilio mecanico\n");
-                    printf("Por favor ingrese su nombre:\n");
-
+                    printf("Por favor ingrese su nombre y apellido: \n");
                     scanf(" %29s",solicitudes[clienteLogueado].nombre);
-                    /*UBICACION*/
-                    do {
                     printf("Seleccione su ubicacion:\n");
                     printf("1. Merlo\n");
                     printf("2. Ituzaingo\n");
                     printf("3. Moron\n");
                     printf("Opcion: ");
-                    scanf("%d",&solicitudes[clienteLogueado].ubicacion);
-                    }while (solicitudes[clienteLogueado].ubicacion < UBICACION_MERLO || solicitudes[clienteLogueado].ubicacion > UBICACION_MORON);
-                    
-                    /*PATENTE*/
+                    scanf("%d", &ubicacion);
+                    while (ubicacion < UBICACION_MERLO || ubicacion > UBICACION_MORON) 
+                        {
+                            printf("Ubicacion incorrecta. Ingrese nuevamente: ");
+                            Sleep(1500);
+                            system("cls");
+                            printf("Seleccione su ubicacion:\n");
+                            printf("1. Merlo\n");
+                            printf("2. Ituzaingo\n");
+                            printf("3. Moron\n");
+                            printf("Opcion: ");
+                            scanf("%d",&solicitudes[clienteLogueado].ubicacion = ubicacion;
+                        }
                     printf("Por favor ingrese la patente : (ejemplo AAA123)\n");
-
                     scanf(" %29s",solicitudes[clienteLogueado].patente);
-                    /*VEHICULO*/
-                    do {
                     printf("Por favor indique el tipo de vehiculo que desea remolcar: \n");
                     printf("1 - Moto\n");
                     printf("2 - Auto\n");
                     printf("3 - Camioneta\n");
                     printf("Opcion: ");
                     scanf(" %d",&solicitudes[clienteLogueado].tipoVehiculo);
-                    }while (solicitudes[clienteLogueado].tipoVehiculo < VEHICULO_MOTO  || solicitudes[clienteLogueado].tipoVehiculo > VEHICULO_CAMIONETA);
-                       
-                    /*SITUACION*/
-                    do{
-                    printf("Seleccione la situacion:\n");
-                    printf("1 - Pinchadura\n");
-                    printf("2 - Falla mecanica\n");
-                    printf("3 - Accidente/Choque\n");
-                    printf("Opcion: ");
-                    scanf("%d", &solicitudes[clienteLogueado].situacion); 
-                    } while (solicitudes[clienteLogueado].situacion < SITUACION_PINCHADURA || solicitudes[clienteLogueado].situacion > SITUACION_ACCIDENTE);
-    
-                    /*RESUMEN Y CONFIRMACION*/
+                    while (solicitudes[clienteLogueado].tipoVehiculo < VEHICULO_MOTO  || solicitudes[clienteLogueado].tipoVehiculo > VEHICULO_CAMIONETA)
+                        {
+                            printf("Por favor ingrese un numero correcto\n");
+                            Sleep(1500);
+                            system("cls");
+                            printf("Por favor indique el tipo de vehiculo que desea remolcar: \n");
+                            printf("1 - Moto\n");
+                            printf("2 - Auto\n");
+                            printf("3 - Camioneta\n");
+                            scanf(" %d",&solicitudes[clienteLogueado].tipoVehiculo);
+                        }
                     system("cls");
-                    mostrarResumenSolicitud(clienteLogueado,solicitudes);
-                    do{
+                    printf("========= RESUMEN DE LA SOLICITUD =========\n");
+                    printf("Nombre: %s\n",solicitudes[clienteLogueado].nombre);
+                    printf("Ubicacion: %d\n",solicitudes[clienteLogueado].ubicacion);
+                    printf("Patente: %s\n",solicitudes[clienteLogueado].patente);
+                    printf("Tipo de vehiculo: %d\n",solicitudes[clienteLogueado].tipoVehiculo);
+                    printf("----------------------------------------------------\n");
                     printf("\n1 - Si desea confirmar la solicitud\n");
                     printf("\n2 - Si desea volver a cargar los datos\n");
                     printf("\n0 - Si desea cancelar la solicitud\n");
                     scanf(" %d",&confirmar);
-                    }while (confirmar < 0 || confirmar >2);
+                    while (confirmar < 0 || confirmar >2){
+                        printf("Seleccione una opcion correcta\n");
+                        Sleep(1500);
+                        system("cls");
+                        printf("========= RESUMEN DE LA SOLICITUD =========\n");
+                        printf("Nombre: %s\n",solicitudes[clienteLogueado].nombre);
+                        printf("Ubicacion: %s\n",solicitudes[clienteLogueado].ubicacion);
+                        printf("Patente: %s\n",solicitudes[clienteLogueado].patente);
+                        printf("Tipo de vehiculo: %d\n",solicitudes[clienteLogueado].tipoVehiculo);
+                        printf("----------------------------------------------------\n");
+                        printf("\n1 - Si desea confirmar la solicitud\n");
+                        printf("\n2 - Si desea volver a cargar los datos\n");
+                        printf("\n0 - Si desea cancelar la solicitud\n");
+                        scanf(" %d",&confirmar);
+                    }
                 }
                     if (confirmar == 1)
                         {
@@ -389,59 +399,6 @@ void registrarSolicitud(int clienteLogueado,solicitudes_t solicitudes[]){
                 }
 }
 
-void mostrarResumenSolicitud(int clienteLogueado,solicitudes_t solicitudes[])
-{
-    printf("========= RESUMEN DE LA SOLICITUD =========\n");
-    printf("Nombre: %s\n",solicitudes[clienteLogueado].nombre);
-    printf("Patente: %s\n",solicitudes[clienteLogueado].patente);
-    printf("Ubicacion: ");
-    switch (solicitudes[clienteLogueado].ubicacion)
-    {
-        case UBICACION_MERLO:
-            printf("Merlo\n");
-            break;
-        
-        case UBICACION_ITUZAINGO:
-            printf("Ituzaingo\n");
-            break;
-
-        case UBICACION_MORON:
-            printf("Moron\n");
-            break;
-    }
-    printf("Tipo de vehiculo: ");
-    switch (solicitudes[clienteLogueado].tipoVehiculo)
-    {
-        case VEHICULO_MOTO:
-            printf("Moto\n");
-            break;
-
-        case VEHICULO_AUTO:
-            printf("Auto\n");
-            break;
-
-        case VEHICULO_CAMIONETA:
-            printf("Camioneta\n");
-            break;
-    }
-    printf("Situacion: ");
-    switch (solicitudes[clienteLogueado].situacion)
-    {
-        case SITUACION_PINCHADURA:
-            printf("Pinchadura\n");
-            break;
-
-        case SITUACION_FALLA_MECANICA:
-            printf("Falla mecanica\n");
-            break;
-
-        case SITUACION_ACCIDENTE:
-            printf("Accidente/Choque\n");
-            break;
-    }
-
-        printf("-------------------------------------------\n");
-}
 
 void menuChofer() {
     int opcion=-1;
