@@ -5,10 +5,7 @@
 #include <time.h>     // se usa para aleatorios tambien
 #include <windows.h> //lo usamos para esperar x cantidad de tiempo
 
-#define CANT_CHOFERES 3
-#define CANT_CLIENTES 3
-#define CANT_ADMIN 1
-#define CANT_SOPORTE 1
+#define CANT_PERFILES 8
 #define CANT_SOLICITUDES 10
 #define TEXTO 30
 #define SIN_SOLICITUD 0
@@ -24,35 +21,23 @@
 #define VEHICULO_MOTO 1
 #define VEHICULO_AUTO 2
 #define VEHICULO_CAMIONETA 3
+#define CANT_POSIBILIDADES 3
 //Definicion de las estructuras de los perfiles
 typedef struct{
-    int idChofer;
+    char nombre[TEXTO];
+    char apellido[TEXTO];
+    int idPerfil;
     char usuario[TEXTO];
     char clave[TEXTO];
-}chofer_t;
+}perfil_t;
 
-typedef struct{
-    int idCliente;
-    char usuario[TEXTO];
-    char clave[TEXTO];
-}cliente_t;
-
-typedef struct{
-    char usuario[TEXTO];
-    char clave[TEXTO];
-}admin_t;
-
-typedef struct{
-    char usuario[TEXTO];
-    char clave[TEXTO];
-}soporte_t;
 //----------------------------Estructura de la solicitud
 typedef struct{
     int idCliente;
-    char nombre[TEXTO];
-    char ubicacion[TEXTO];
-    char patente[TEXTO];
+    int ubicacion;
     int tipoVehiculo;
+    int situacion;
+    char patente[TEXTO];
     int estado;
     int choferAsignado;
 }solicitudes_t;
@@ -60,66 +45,52 @@ typedef struct{
 //Declaracion de los prototipos
 void mostrarBienvenida();
 void inicioSesion(char usuario[], char password[]);
-int validaLogin (char usuario[], char password[],chofer_t chofer[],cliente_t cliente[],admin_t admin[],soporte_t soporte[],int *choferLogueado, int *clienteLogueado);
-void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]);
+int validaLogin (char usuario[], char password[],perfil_t perfiles[],int *usuarioLogueado);
+void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]);
 void menuChofer();
 void menuAdmin();
 void menuSoporte();
-void registrarSolicitud(int clienteLogueado,solicitudes_t solicitudes[]);
+bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]);
 //Inicio del algoritmo
 int main() { 
     
-    //Declaracion de los vectores de las estructuras
-    chofer_t chofer[CANT_CHOFERES];
-    cliente_t cliente[CANT_CLIENTES];
-    admin_t admin[CANT_ADMIN];
-    soporte_t soporte[CANT_SOPORTE];
+    //Declaracion de los vectores de las estructuras y credenciales hardcodeadas
+    perfil_t perfiles[CANT_PERFILES]= {
+        {"Carlos", "Rodriguez", PERFIL_CHOFER, "chofer1", "chofer123"},
+        {"Sandra", "Sanchez", PERFIL_CHOFER, "chofer2", "chofer123"},
+        {"Pablo", "Escobar", PERFIL_CHOFER, "chofer3", "chofer123"},
+
+        {"Tomas", "Escobar", PERFIL_CLIENTE, "cliente1", "cliente123"},
+        {"Omar", "Gomez", PERFIL_CLIENTE, "cliente2", "cliente123"},
+        {"Agustina", "Gonzalez", PERFIL_CLIENTE, "cliente3", "cliente123"},
+
+        {"Gabriel", "Avalos", PERFIL_ADMIN, "admin1","admin123"},
+        {"Lionel", "Messi", PERFIL_SOPORTE, "soporte1","soporte123"}
+    };
     solicitudes_t solicitudes[CANT_SOLICITUDES];
 
-    //Credenciales hardcodeadas
-    //strcpy() viene de <string.h> copia una cadena dentro de un campo char[] de la estructura
-    chofer[0].idChofer = 0;
-    strcpy(chofer[0].usuario, "chofer1");
-    strcpy(chofer[0].clave,"chofer123");
+    char ubicaciones[CANT_POSIBILIDADES][TEXTO] = {
+        "Merlo",
+        "Ituzaingo",
+        "Moron"
+    };
 
-    chofer[1].idChofer = 1;
-    strcpy(chofer[1].usuario, "chofer2");
-    strcpy(chofer[1].clave,"chofer123");
+    char tiposVehiculos[CANT_POSIBILIDADES][TEXTO] = {
+        "Moto",
+        "Auto",
+        "Camioneta"
+    };
 
-    chofer[2].idChofer = 2;
-    strcpy(chofer[2].usuario, "chofer3");
-    strcpy(chofer[2].clave,"chofer123");
-    //--------------------------------------------
-    cliente[0].idCliente = 0;
-    strcpy(cliente[0].usuario, "cliente1");
-    strcpy(cliente[0].clave,"cliente123");
-
-    cliente[1].idCliente = 1;
-    strcpy(cliente[1].usuario, "cliente2");
-    strcpy(cliente[1].clave,"cliente123");
-
-    cliente[2].idCliente = 2;
-    strcpy(cliente[2].usuario, "cliente3");
-    strcpy(cliente[2].clave,"cliente123");
-    //--------------------------------------------
-    strcpy(admin[0].usuario, "admin1");
-    strcpy(admin[0].clave,"admin123");
-    //--------------------------------------------
-    strcpy(soporte[0].usuario, "soporte1");
-    strcpy(soporte[0].clave,"soporte123");
+    char situaciones[CANT_POSIBILIDADES][TEXTO] = {
+        "Pinchadura",
+        "Falla mecanica",
+        "Accidente/choque"
+    };
     
-
     char usuario[50], password[50];
-    int tipoUsuario, valorUsuario;
-    int choferLogueado = -1, clienteLogueado = -1;
-    int i;
-    //Realiza el conteo de clientes y asu vez los asigna sin solicitud y sin chofer
-    for (i=0; i<CANT_CLIENTES; i++){
-        solicitudes[i].idCliente = i ;
-        solicitudes[i].estado = SIN_SOLICITUD;
-        solicitudes[i].choferAsignado = -1;
-
-    }
+    int valorUsuario,cantSolicitudes=0;
+    int usuarioLogueado = -1;
+ 
     //system("pause"); equivalente a esperar tecla
     //system("cls"); equivalente a limpiar pantalla
     //Sleep(3000); // 3 segundos   este es para esperar X segundos, se escribe en milisegundos
@@ -138,37 +109,41 @@ int main() {
             inicioSesion(usuario, password);
 
             //Validacion para credenciales incorrectas en login
-            valorUsuario=validaLogin(usuario,password,chofer,cliente,admin,soporte,&choferLogueado,&clienteLogueado);
+            valorUsuario=validaLogin(usuario,password,perfiles,&usuarioLogueado);
             
             if (valorUsuario==LOGIN_INCORRECTO){
                 printf("Usuario o clave incorrecta. Por favor, intente nuevamente.\n");
-                Sleep(2500);
+                Sleep(1500);
                 system("cls");
             }
         }
         switch (valorUsuario)
         {
             case PERFIL_CHOFER:
+                system("cls");
                 printf("Inicio de sesion correcto.\n");
-                printf("Perfil: Chofer ID : %d\n",chofer[choferLogueado].idChofer);
+                printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre, perfiles[usuarioLogueado].apellido);
                 Sleep(2500);
                 menuChofer();
                 break;
             case PERFIL_CLIENTE:
+                system("cls");
                 printf("Inicio de sesion correcto.\n");
-                printf("Perfil: Cliente. ID : %d\n", cliente[clienteLogueado].idCliente);
+                printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre, perfiles[usuarioLogueado].apellido);
                 Sleep(2500);
-                menuCliente(clienteLogueado,solicitudes);   
+                menuCliente(usuarioLogueado,solicitudes, &cantSolicitudes,ubicaciones,situaciones,tiposVehiculos);   
                 break;
             case PERFIL_ADMIN:
+                system("cls");
                 printf("Inicio de sesion correcto.\n");
-                printf("Perfil: Admin\n");
+                printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre, perfiles[usuarioLogueado].apellido);
                 Sleep(1500);
                 menuAdmin();
                 break;
             case PERFIL_SOPORTE:
+                system("cls");
                 printf("Inicio de sesion correcto.\n");
-                printf("Perfil: Soporte\n");
+                printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre, perfiles[usuarioLogueado].apellido);
                 menuSoporte();
                 break;
             default:
@@ -182,8 +157,8 @@ int main() {
         scanf("%d", &continuar); 
        
         valorUsuario=LOGIN_INCORRECTO;
-        choferLogueado = -1;
-        clienteLogueado = -1;
+        usuarioLogueado = -1;
+    
     }
     return 0;
 }
@@ -208,44 +183,24 @@ void inicioSesion(char usuario[], char password[]) {
 // PERFIL_CLIENTE, PERFIL_CHOFER, PERFIL_ADMIN o PERFIL_SOPORTE.
 //strcmp() compara dos cadenas y devuelve 0 cuando son iguales.
 // usuario y password se comparan sin [] porque eso devolveria una sola letra justamente por lo dicho arriba 
-//Incorpore clienteLogueado asi tambien sabemos que cliente es
-int validaLogin(char usuario[], char password[],chofer_t chofer[],cliente_t cliente[],admin_t admin[],soporte_t soporte[],int *choferLogueado, int *clienteLogueado){
+
+int validaLogin(char usuario[], char password[],perfil_t perfiles[],int *usuarioLogueado){
     int i=0;
     int tipoUsuario=LOGIN_INCORRECTO;
     
-    while (i<CANT_CHOFERES && tipoUsuario == LOGIN_INCORRECTO){
-        if(strcmp(usuario, chofer[i].usuario)==0 && strcmp(password,chofer[i].clave)==0){
-            tipoUsuario= PERFIL_CHOFER;
-            *choferLogueado=i;
-        }
-        i++;
-    }
-    i=0;
-    while (i<CANT_CLIENTES && tipoUsuario== LOGIN_INCORRECTO){
-        if(strcmp(usuario, cliente[i].usuario)==0 && strcmp(password,cliente[i].clave)==0){
-            tipoUsuario= PERFIL_CLIENTE;
-            *clienteLogueado=i;
-        }
-        i++;
-    }
-    i=0;
-    while (i<CANT_ADMIN && tipoUsuario== LOGIN_INCORRECTO){
-        if(strcmp(usuario, admin[i].usuario)==0 && strcmp(password,admin[i].clave)==0){
-            tipoUsuario= PERFIL_ADMIN;
-        }
-        i++;
-    }
-    i=0;
-    while (i<CANT_SOPORTE && tipoUsuario== LOGIN_INCORRECTO){
-        if(strcmp(usuario, soporte[i].usuario)==0 && strcmp(password,soporte[i].clave)==0){
-            tipoUsuario= PERFIL_SOPORTE;
+    while (i<CANT_PERFILES && tipoUsuario == LOGIN_INCORRECTO){
+        if(strcmp(usuario, perfiles[i].usuario)==0 && strcmp(password,perfiles[i].clave)==0){
+            *usuarioLogueado=i;
+            tipoUsuario=perfiles[i].idPerfil;
         }
         i++;
     }
     return tipoUsuario;
 } 
-void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
+
+void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]) {
     int opcion=-1;
+    bool solicitudConfirmada;
     while (opcion != 0){
         system("cls");
         printf("====================================================\n");
@@ -253,8 +208,9 @@ void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
         printf("====================================================\n");
         printf("1. Solicitar auxilio mecanico\n");
         printf("2. Consultar estado de la solicitud\n");
-        printf("3. Inciar viaje\n");
-        printf("4. Finalizar viaje\n");
+        printf("3. Contactar a soporte\n");
+        printf("4. Calificar servicio\n");
+        printf("5. Ver historial\n");
         printf("0. Cerrar sesion\n");
         printf("----------------------------------------------------\n");
         printf("Seleccione una opcion: ");
@@ -263,7 +219,7 @@ void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
         switch (opcion)
         {
             case 1:
-                registrarSolicitud(clienteLogueado,solicitudes);
+                solicitudConfirmada=registrarSolicitud(usuarioLogueado,solicitudes,cantSolicitudes,ubicaciones,situaciones,tiposVehiculos);
                 system("pause");
                 break;
 
@@ -273,14 +229,19 @@ void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
                 break;
 
             case 3:
-                printf("Seleccinaste: Inciar viaje\n");
+                printf("Seleccionaste: contactar a soporte\n");
                 system("pause");
                 break;
             
             case 4:
-                printf("Seleccionaste: Finalizar viaje\n");
+                printf("Seleccionaste: calificar servicio\n");
                 system("pause");
                 break;
+            
+            case 5:
+                printf("Seleccionaste: ver historial\n");
+                system("pause");
+                break;    
                 
             case 0:
                 printf("Cerrando sesion...\n");
@@ -295,83 +256,90 @@ void menuCliente(int clienteLogueado, solicitudes_t solicitudes[]) {
     }
 }
 
-void registrarSolicitud(int clienteLogueado,solicitudes_t solicitudes[]){   
-    int confirmar;
-    if (solicitudes[clienteLogueado].estado == SIN_SOLICITUD)
-            {
-                confirmar = 2;
-                while (confirmar == 2)
-                {
-                    system("cls");
-                    printf("Seleccionaste: Solicitar auxilio mecanico\n");
-                    printf("Por favor ingrese su nombre y apellido: \n");
-                    scanf(" %29s",solicitudes[clienteLogueado].nombre);
-                    printf("Por favor ingrese su ubicación: \n");
-                    scanf(" %29s",solicitudes[clienteLogueado].ubicacion);
-                    printf("Por favor ingrese la patente : (ejemplo AAA123)\n");
-                    scanf(" %29s",solicitudes[clienteLogueado].patente);
-                    printf("Por favor indique el tipo de vehiculo que desea remolcar: \n");
-                    printf("1 - Moto\n");
-                    printf("2 - Auto\n");
-                    printf("3 - Camioneta\n");
-                    scanf(" %d",&solicitudes[clienteLogueado].tipoVehiculo);
-                    while (solicitudes[clienteLogueado].tipoVehiculo < VEHICULO_MOTO  || solicitudes[clienteLogueado].tipoVehiculo > VEHICULO_CAMIONETA)
-                        {
-                            printf("Por favor ingrese un numero correcto\n");
-                            Sleep(1500);
-                            system("cls");
-                            printf("Por favor indique el tipo de vehiculo que desea remolcar: \n");
-                            printf("1 - Moto\n");
-                            printf("2 - Auto\n");
-                            printf("3 - Camioneta\n");
-                            scanf(" %d",&solicitudes[clienteLogueado].tipoVehiculo);
-                        }
-                    system("cls");
-                    printf("========= RESUMEN DE LA SOLICITUD =========\n");
-                    printf("Nombre: %s\n",solicitudes[clienteLogueado].nombre);
-                    printf("Ubicacion: %s\n",solicitudes[clienteLogueado].ubicacion);
-                    printf("Patente: %s\n",solicitudes[clienteLogueado].patente);
-                    printf("Tipo de vehiculo: %d\n",solicitudes[clienteLogueado].tipoVehiculo);
-                    printf("----------------------------------------------------\n");
-                    printf("\n1 - Si desea confirmar la solicitud\n");
-                    printf("\n2 - Si desea volver a cargar los datos\n");
-                    printf("\n0 - Si desea cancelar la solicitud\n");
-                    scanf(" %d",&confirmar);
-                    while (confirmar < 0 || confirmar >2){
-                        printf("Seleccione una opcion correcta\n");
-                        Sleep(1500);
-                        system("cls");
-                        printf("========= RESUMEN DE LA SOLICITUD =========\n");
-                        printf("Nombre: %s\n",solicitudes[clienteLogueado].nombre);
-                        printf("Ubicacion: %s\n",solicitudes[clienteLogueado].ubicacion);
-                        printf("Patente: %s\n",solicitudes[clienteLogueado].patente);
-                        printf("Tipo de vehiculo: %d\n",solicitudes[clienteLogueado].tipoVehiculo);
-                        printf("----------------------------------------------------\n");
-                        printf("\n1 - Si desea confirmar la solicitud\n");
-                        printf("\n2 - Si desea volver a cargar los datos\n");
-                        printf("\n0 - Si desea cancelar la solicitud\n");
-                        scanf(" %d",&confirmar);
-                    }
-                }
-                    if (confirmar == 1)
-                        {
-                            system("cls");
-                            solicitudes[clienteLogueado].estado = SOLICITUD_PENDIENTE;
-                            printf("Solicitud registrada correctamente.\n");
-                        }
-                        else 
-                            {
-                                system("cls");
-                                printf("Solicitud cancelada. \n");
-                            }
-                
-            } else 
-                {
-                    system("cls");
-                    printf("Usted ya tiene una solicitud activa. \n");
-                }
-}
+ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]){
+    int opcionUbicacion,opcionVehiculos,opcionSituacion, confirmar;
+    bool confirmada;
+    system("cls");
 
+    printf("===============================================================\n");
+ 	printf("                     Solicitar auxilio                         \n");
+	printf("===============================================================\n");
+	printf(" Por favor, seleccione y complete las opciones de la solicitud.\n");
+	printf("---------------------------------------------------------------\n");
+
+    do{
+        printf("Seleccione la ubicación\n");
+        printf("1. Merlo\n");
+        printf("2. Ituzaingo\n");
+        printf("3. Moron\n");
+        scanf("%d", &opcionUbicacion);
+        if(opcionUbicacion <1 || opcionUbicacion >3){
+            system("cls");
+            printf("Por favor, ingrese una opcion correcta\n");
+        }
+    }while(opcionUbicacion <1 || opcionUbicacion >3);
+    solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion; 
+
+        do{
+        printf("Seleccione el tipo de vehiculo\n");
+        printf("1. Moto\n");
+        printf("2. Auto\n");
+        printf("3. Camioneta\n");
+        scanf("%d", &opcionVehiculos);
+        if(opcionVehiculos <1 || opcionVehiculos >3){
+            system("cls");
+            printf("Por favor, ingrese una opcion correcta\n");
+        }
+    }while(opcionVehiculos <1 || opcionVehiculos >3);
+    solicitudes[*cantSolicitudes].tipoVehiculo = opcionVehiculos; 
+
+    do{
+        printf("Seleccione la situación\n");
+        printf("1. Pinchadura\n");
+        printf("2. Falla mecanica\n");
+        printf("3. Accidente/choque\n");
+        scanf("%d", &opcionSituacion);
+        if(opcionSituacion <1 || opcionSituacion >3){
+            system("cls");
+            printf("Por favor, ingrese una opcion correcta\n");
+        }
+    }while(opcionSituacion <1 || opcionSituacion >3);
+    solicitudes[*cantSolicitudes].situacion = opcionSituacion; 
+
+    printf("Ingrese su patente\n");
+    scanf("%29s",solicitudes[*cantSolicitudes].patente);
+
+    system("cls");
+
+    printf("--------------------------------------\n");
+    printf("     Los datos seleccionados son:     \n");
+    printf("--------------------------------------\n");
+    printf("Ubicación: %s\n",ubicaciones[opcionUbicacion-1]);
+    printf("Tipo de vehiculo: %s\n",tiposVehiculos[opcionVehiculos-1]);
+    printf("Situación: %s\n", situaciones[opcionSituacion-1]);
+    printf("Patente: %s\n", solicitudes[*cantSolicitudes].patente);
+    printf("..............................................................\n");
+    printf("Para avanzar con su solicitud, seleccione la opcion deseada.  \n");
+    printf("..............................................................\n");
+    printf("1. Confirmar solicitud\n");
+    printf("2. Cancelar solicitud\n");
+    scanf("%d",&confirmar);
+
+    while(confirmar !=1 && confirmar !=2 ){
+        printf("Por favor, ingrese una opcion correcta \n");
+        scanf("%d",&confirmar);
+    }
+
+    if(confirmar == 1){
+        confirmada= true;
+        solicitudes[*cantSolicitudes].idCliente= usuarioLogueado;
+        (*cantSolicitudes) ++;
+    }else if (confirmar== 2){
+        confirmada= false;
+    }
+return confirmada;
+}
+        
 
 void menuChofer() {
     int opcion=-1;
@@ -380,32 +348,38 @@ void menuChofer() {
         printf("====================================================\n");
         printf("                  MENU CHOFER                       \n");
         printf("====================================================\n");
-        printf("1. Ver solicitud asignada\n");
-        printf("2. Aceptar solicitud\n");
-        printf("3. Iniciar viaje\n");
-        printf("4. Finalizar viaje\n");
+        printf("1. Estado actual\n");
+        printf("2. Servicio asignado\n");
+        printf("3. Finalizar viaje\n");
+        printf("4. Contactar a soporte\n");
+        printf("5. Historial de ganancias\n");
         printf("0. Cerrar sesion\n");
         printf("Seleccione una opcion: ");
         scanf("%d", &opcion);
 
         switch (opcion){
             case 1:
-                printf("Seleccionaste: Ver solicitud asignada\n");
+                printf("Seleccionaste: Estado actual\n");
                 system("pause");
                 break;
 
             case 2:
-                printf("Seleccionaste: Aceptar solicitud\n");
+                printf("Seleccionaste: Servicio asignado\n");
                 system("pause");
                 break;
 
             case 3:
-                printf("Seleccionaste: Iniciar viaje\n");
+                printf("Seleccionaste: Finalizar viaje\n");
                 system("pause");
                 break;
 
             case 4:
-                printf("Seleccionaste: Finalizar viaje\n");
+                printf("Seleccionaste: Contactar a soporte\n");
+                system("pause");
+                break;
+
+            case 5:
+                printf("Seleccionaste: Historial de ganancias\n");
                 system("pause");
                 break;
 
