@@ -22,6 +22,7 @@
 #define VEHICULO_AUTO 2
 #define VEHICULO_CAMIONETA 3
 #define CANT_POSIBILIDADES 3
+
 //Definicion de las estructuras de los perfiles
 typedef struct{
     char nombre[TEXTO];
@@ -151,11 +152,14 @@ int main() {
                 break;
         }
         system("cls");
+        do{
         printf("Desea volver a iniciar sesion?\n");
         printf("1- SI\n");
         printf("0- NO, quiero cerrar SIGAM\n");
+        printf("Opcion: ");
         scanf("%d", &continuar); 
-       
+        system("cls");
+        }while (continuar < 0 || continuar > 1);
         valorUsuario=LOGIN_INCORRECTO;
         usuarioLogueado = -1;
     
@@ -225,6 +229,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
 
             case 2:
                 printf("Seleccionaste: Consultar estado de la solicitud\n");
+                system("cls");
                 system("pause");
                 break;
 
@@ -232,7 +237,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
                 printf("Seleccionaste: contactar a soporte\n");
                 system("pause");
                 break;
-            
+
             case 4:
                 printf("Seleccionaste: calificar servicio\n");
                 system("pause");
