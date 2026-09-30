@@ -1,0 +1,8 @@
+# Ejecutables generados al compilar
+*.exe
+
+# Archivos temporales de Code Runner
+tempCodeRunnerFile.c
+
+# Configuración local de VS Code
+.vscode/
