@@ -230,8 +230,6 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
                 solicitudConfirmada=registrarSolicitud(usuarioLogueado,solicitudes,cantSolicitudes,cantCanceladas,ubicaciones,situaciones,tiposVehiculos);
                 if (solicitudConfirmada){
                     printf("La solicitud fue confirmada aguarde y se le asignara un chofer\n");
-                }else{
-                    printf("La solicitud fue cancelada");
                 }
                 system("pause");
                 break;
@@ -271,94 +269,112 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
     }
 }
 
- bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]){
-    int opcionUbicacion,opcionVehiculos,opcionSituacion, confirmar;
-    bool confirmada;
+bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO])
+{
+    int opcionUbicacion,opcionVehiculos,opcionSituacion, confirmar,i;
+    bool confirmada = true;
     system("cls");
-
-    printf("===============================================================\n");
- 	printf("                     Solicitar auxilio                         \n");
-	printf("===============================================================\n");
-	printf(" Por favor, seleccione y complete las opciones de la solicitud.\n");
-	printf("---------------------------------------------------------------\n");
-
-    do{
-        printf("Seleccione la ubicación\n");
-        printf("1. Merlo\n");
-        printf("2. Ituzaingo\n");
-        printf("3. Moron\n");
-        scanf("%d", &opcionUbicacion);
-        if(opcionUbicacion <1 || opcionUbicacion >3){
-            system("cls");
-            printf("Por favor, ingrese una opcion correcta\n");
+      /* Buscar si el cliente ya tiene una solicitud activa */
+    for (i = 0; i < *cantSolicitudes; i++)
+    {
+        if (solicitudes[i].idCliente == usuarioLogueado && (solicitudes[i].estado == SOLICITUD_PENDIENTE || solicitudes[i].estado == CHOFER_ASIGNADO || solicitudes[i].estado == VIAJE_INICIADO))
+        {
+            printf("Usted ya posee una solicitud activa.\n");
+            return false;
         }
-    }while(opcionUbicacion <1 || opcionUbicacion >3);
-    solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion; 
-
-        do{
-        printf("Seleccione el tipo de vehiculo\n");
-        printf("1. Moto\n");
-        printf("2. Auto\n");
-        printf("3. Camioneta\n");
-        scanf("%d", &opcionVehiculos);
-        if(opcionVehiculos <1 || opcionVehiculos >3){
-            system("cls");
-            printf("Por favor, ingrese una opcion correcta\n");
-        }
-    }while(opcionVehiculos <1 || opcionVehiculos >3);
-    solicitudes[*cantSolicitudes].tipoVehiculo = opcionVehiculos; 
-
-    do{
-        printf("Seleccione la situación\n");
-        printf("1. Pinchadura\n");
-        printf("2. Falla mecanica\n");
-        printf("3. Accidente/choque\n");
-        scanf("%d", &opcionSituacion);
-        if(opcionSituacion <1 || opcionSituacion >3){
-            system("cls");
-            printf("Por favor, ingrese una opcion correcta\n");
-        }
-    }while(opcionSituacion <1 || opcionSituacion >3);
-    solicitudes[*cantSolicitudes].situacion = opcionSituacion; 
-
-    printf("Ingrese su patente\n");
-    scanf("%29s",solicitudes[*cantSolicitudes].patente);
-
-    system("cls");
-
-    printf("--------------------------------------\n");
-    printf("     Los datos seleccionados son:     \n");
-    printf("--------------------------------------\n");
-    printf("Ubicación: %s\n",ubicaciones[opcionUbicacion-1]);
-    printf("Tipo de vehiculo: %s\n",tiposVehiculos[opcionVehiculos-1]);
-    printf("Situación: %s\n", situaciones[opcionSituacion-1]);
-    printf("Patente: %s\n", solicitudes[*cantSolicitudes].patente);
-    printf("..............................................................\n");
-    printf("Para avanzar con su solicitud, seleccione la opcion deseada.  \n");
-    printf("..............................................................\n");
-    printf("1. Confirmar solicitud\n");
-    printf("2. Cancelar solicitud\n");
-    printf("Opcion: ");
-    scanf("%d",&confirmar);
-    system("cls");
-
-    while(confirmar !=1 && confirmar !=2 ){
-        printf("Por favor, ingrese una opcion correcta \n");
-        scanf("%d",&confirmar);
     }
 
-    if(confirmar == 1){
-        confirmada= true;
-        solicitudes[*cantSolicitudes].idCliente= usuarioLogueado;
-        solicitudes[*cantSolicitudes].estado=SOLICITUD_PENDIENTE;
-        solicitudes[*cantSolicitudes].choferAsignado=-1;
-        (*cantSolicitudes) ++;
-    }else if (confirmar== 2){
-        confirmada= false;
-        (*cantCanceladas) ++;
+    /* Verificar que exista espacio en el vector(que no haya superado la cantidad de solicitudes) */
+    if (*cantSolicitudes >= CANT_SOLICITUDES)
+    {
+        printf("No se pueden registrar mas solicitudes.\n");
+        return false;
     }
-return confirmada;
+            printf("===============================================================\n");
+            printf("                     Solicitar auxilio                         \n");
+            printf("===============================================================\n");
+            printf(" Por favor, seleccione y complete las opciones de la solicitud.\n");
+            printf("---------------------------------------------------------------\n");
+
+            do{
+                printf("Seleccione la ubicación\n");
+                printf("1. Merlo\n");
+                printf("2. Ituzaingo\n");
+                printf("3. Moron\n");
+                scanf("%d", &opcionUbicacion);
+                if(opcionUbicacion <1 || opcionUbicacion >3){
+                    system("cls");
+                    printf("Por favor, ingrese una opcion correcta\n");
+                }
+            }while(opcionUbicacion <1 || opcionUbicacion >3);
+            solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion; 
+
+                do{
+                printf("Seleccione el tipo de vehiculo\n");
+                printf("1. Moto\n");
+                printf("2. Auto\n");
+                printf("3. Camioneta\n");
+                scanf("%d", &opcionVehiculos);
+                if(opcionVehiculos <1 || opcionVehiculos >3){
+                    system("cls");
+                    printf("Por favor, ingrese una opcion correcta\n");
+                }
+            }while(opcionVehiculos <1 || opcionVehiculos >3);
+            solicitudes[*cantSolicitudes].tipoVehiculo = opcionVehiculos; 
+
+            do{
+                printf("Seleccione la situación\n");
+                printf("1. Pinchadura\n");
+                printf("2. Falla mecanica\n");
+                printf("3. Accidente/choque\n");
+                scanf("%d", &opcionSituacion);
+                if(opcionSituacion <1 || opcionSituacion >3){
+                    system("cls");
+                    printf("Por favor, ingrese una opcion correcta\n");
+                }
+            }while(opcionSituacion <1 || opcionSituacion >3);
+            solicitudes[*cantSolicitudes].situacion = opcionSituacion; 
+
+            printf("Ingrese su patente\n");
+            scanf("%29s",solicitudes[*cantSolicitudes].patente);
+
+            system("cls");
+
+            printf("--------------------------------------\n");
+            printf("     Los datos seleccionados son:     \n");
+            printf("--------------------------------------\n");
+            printf("Ubicación: %s\n",ubicaciones[opcionUbicacion-1]);
+            printf("Tipo de vehiculo: %s\n",tiposVehiculos[opcionVehiculos-1]);
+            printf("Situación: %s\n", situaciones[opcionSituacion-1]);
+            printf("Patente: %s\n", solicitudes[*cantSolicitudes].patente);
+            printf("..............................................................\n");
+            printf("Para avanzar con su solicitud, seleccione la opcion deseada.  \n");
+            printf("..............................................................\n");
+            printf("1. Confirmar solicitud\n");
+            printf("2. Cancelar solicitud\n");
+            printf("Opcion: ");
+            scanf("%d",&confirmar);
+            system("cls");
+
+            while(confirmar !=1 && confirmar !=2 ){
+                printf("Por favor, ingrese una opcion correcta \n");
+                scanf("%d",&confirmar);
+            }
+
+            if(confirmar == 1){
+                confirmada= true;
+                solicitudes[*cantSolicitudes].idCliente= usuarioLogueado;
+                solicitudes[*cantSolicitudes].estado=SOLICITUD_PENDIENTE;
+                solicitudes[*cantSolicitudes].choferAsignado=-1;
+                (*cantSolicitudes) ++;
+                return true;
+            }
+            (*cantCanceladas) ++;
+            printf("La solicitud fue cancelada.\n");
+            return false;
 }
+
+
 
 void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantSolicitudes,char ubicacion [][TEXTO],char tipoVehiculo[][TEXTO],char situacion[][TEXTO])
 {   
