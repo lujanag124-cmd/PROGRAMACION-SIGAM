@@ -272,7 +272,8 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
 bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO])
 {
     int opcionUbicacion,opcionVehiculos,opcionSituacion, confirmar,i;
-    bool confirmada = true;
+    bool confirmada = false;
+    bool puedeRegistrar = true;
     system("cls");
       /* Buscar si el cliente ya tiene una solicitud activa */
     for (i = 0; i < *cantSolicitudes; i++)
@@ -280,7 +281,8 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *ca
         if (solicitudes[i].idCliente == usuarioLogueado && (solicitudes[i].estado == SOLICITUD_PENDIENTE || solicitudes[i].estado == CHOFER_ASIGNADO || solicitudes[i].estado == VIAJE_INICIADO))
         {
             printf("Usted ya posee una solicitud activa.\n");
-            return false;
+            puedeRegistrar = false;
+            break;
         }
     }
 
@@ -288,54 +290,69 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *ca
     if (*cantSolicitudes >= CANT_SOLICITUDES)
     {
         printf("No se pueden registrar mas solicitudes.\n");
-        return false;
+        puedeRegistrar = false;
     }
-            printf("===============================================================\n");
-            printf("                     Solicitar auxilio                         \n");
-            printf("===============================================================\n");
-            printf(" Por favor, seleccione y complete las opciones de la solicitud.\n");
-            printf("---------------------------------------------------------------\n");
+    /*En caso de poder registrarse comienza con el cuestionario*/
+    if (puedeRegistrar == true)
+    { 
+            printf("====================================================================\n");
+            printf("                          Solicitar auxilio                         \n");
+            printf("====================================================================\n");
+            printf(" A continuacion, seleccione y complete las opciones de la solicitud.\n");
+            printf("--------------------------------------------------------------------\n");
+            Sleep(3500);
+            system("cls");
 
             do{
-                printf("Seleccione la ubicación\n");
+                printf("Seleccione la ubicacion\n");
                 printf("1. Merlo\n");
                 printf("2. Ituzaingo\n");
                 printf("3. Moron\n");
+                printf("Opcion: ");
                 scanf("%d", &opcionUbicacion);
-                if(opcionUbicacion <1 || opcionUbicacion >3){
+                if(opcionUbicacion <1 || opcionUbicacion >3)
+                {
                     system("cls");
                     printf("Por favor, ingrese una opcion correcta\n");
                 }
             }while(opcionUbicacion <1 || opcionUbicacion >3);
             solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion; 
+            system("cls");
 
                 do{
                 printf("Seleccione el tipo de vehiculo\n");
                 printf("1. Moto\n");
                 printf("2. Auto\n");
                 printf("3. Camioneta\n");
+                printf("Opcion: ");
                 scanf("%d", &opcionVehiculos);
-                if(opcionVehiculos <1 || opcionVehiculos >3){
+                if(opcionVehiculos <1 || opcionVehiculos >3)
+                {
                     system("cls");
                     printf("Por favor, ingrese una opcion correcta\n");
                 }
             }while(opcionVehiculos <1 || opcionVehiculos >3);
             solicitudes[*cantSolicitudes].tipoVehiculo = opcionVehiculos; 
+            system("cls");
 
             do{
                 printf("Seleccione la situación\n");
                 printf("1. Pinchadura\n");
                 printf("2. Falla mecanica\n");
                 printf("3. Accidente/choque\n");
+                printf("Opcion: ");
                 scanf("%d", &opcionSituacion);
-                if(opcionSituacion <1 || opcionSituacion >3){
+                if(opcionSituacion <1 || opcionSituacion >3)
+                {
                     system("cls");
                     printf("Por favor, ingrese una opcion correcta\n");
                 }
             }while(opcionSituacion <1 || opcionSituacion >3);
             solicitudes[*cantSolicitudes].situacion = opcionSituacion; 
 
+            system("cls");
             printf("Ingrese su patente\n");
+            printf("Patente: ");
             scanf("%29s",solicitudes[*cantSolicitudes].patente);
 
             system("cls");
@@ -356,22 +373,26 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *ca
             scanf("%d",&confirmar);
             system("cls");
 
-            while(confirmar !=1 && confirmar !=2 ){
+            while(confirmar !=1 && confirmar !=2 )
+            {
                 printf("Por favor, ingrese una opcion correcta \n");
+                printf("Opcion: ");
                 scanf("%d",&confirmar);
             }
 
-            if(confirmar == 1){
-                confirmada= true;
-                solicitudes[*cantSolicitudes].idCliente= usuarioLogueado;
-                solicitudes[*cantSolicitudes].estado=SOLICITUD_PENDIENTE;
-                solicitudes[*cantSolicitudes].choferAsignado=-1;
+            if(confirmar == 1)
+            {
+                solicitudes[*cantSolicitudes].idCliente= usuarioLogueado;solicitudes[*cantSolicitudes].estado=SOLICITUD_PENDIENTE;solicitudes[*cantSolicitudes].choferAsignado=-1;
                 (*cantSolicitudes) ++;
-                return true;
+                confirmada = true;
             }
+            else{
             (*cantCanceladas) ++;
             printf("La solicitud fue cancelada.\n");
-            return false;
+            confirmada = false;
+            }
+    }
+    return confirmada;
 }
 
 
