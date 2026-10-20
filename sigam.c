@@ -6,8 +6,15 @@
 #include <windows.h> //lo usamos para esperar x cantidad de tiempo
 
 #define CANT_PERFILES 8
+#define CANT_CHOFERES 3 
 #define CANT_SOLICITUDES 10
 #define TEXTO 30
+#define DISPONIBLE 1
+#define OCUPADO 2
+#define NO_DISPONIBLE 3
+#define GRUA_MOTO 1
+#define GRUA_AUTO 2
+#define GRUA_CAMIONETA 3
 #define SIN_SOLICITUD 0
 #define SOLICITUD_PENDIENTE 1
 #define CHOFER_ASIGNADO 2
@@ -21,17 +28,29 @@
 #define VEHICULO_MOTO 1
 #define VEHICULO_AUTO 2
 #define VEHICULO_CAMIONETA 3
+#define MERLO 1
+#define ITUZAINGO  2
+#define MORON 3
 #define CANT_POSIBILIDADES 3
 #define CANT_MAX_PUNT 10 
 
-//Definicion de las estructuras de los perfiles
+/* Estrucuturas de los perfiles gral */
 typedef struct{
-    int idPerfil;
+    int tipoPerfil;
     char nombre[TEXTO];
     char apellido[TEXTO];
     char usuario[TEXTO];
     char clave[TEXTO];
 }perfil_t;
+
+/* Estrucutura de los choferes */ 
+typedef struct{
+    int idPerfil;
+    int estado;
+    int ubicacion;
+    int tipoGrua;
+    int solicitudAsignada;
+}chofer_t;
 
 //----------------------------Estructura de la solicitud
 typedef struct{
@@ -50,13 +69,14 @@ void mostrarBienvenida(void);
 void inicioSesion(char usuario[], char password[]);
 int validaLogin (char usuario[], char password[],perfil_t perfiles[],int *usuarioLogueado);
 void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes,int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]);
-void menuChofer();
+void menuChofer(int usuarioLogueado,chofer_t choferes[], char ubicacion[][TEXTO], char tiposGrua[][TEXTO]);
 void menuAdmin();
 void menuSoporte();
 bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes,int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]);
 int calcularPrioridad(void);
 void mostrarPrioridad(int prioridad);
 void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantSolicitudes,char ubicacion [][TEXTO],char tiposVehiculos[][TEXTO],char situacion[][TEXTO]);
+void estadoActual(int usuarioLogueado,chofer_t choferes[], char ubicacion[][TEXTO], char tipoGrua[][TEXTO]);
 
 //Inicio del algoritmo
 int main() { 
@@ -74,7 +94,18 @@ int main() {
         {PERFIL_ADMIN,"Gabriel","Avalos",  "admin1","admin123"},
         {PERFIL_SOPORTE,"Lionel","Messi",  "soporte1","soporte123"}
     };
-    
+
+    chofer_t choferes[CANT_CHOFERES] = {
+        {0, NO_DISPONIBLE, MERLO, GRUA_MOTO, -1},
+        {1, NO_DISPONIBLE, ITUZAINGO, GRUA_AUTO, -1},
+        {2, NO_DISPONIBLE, MORON, GRUA_CAMIONETA, -1}
+    };
+
+    char tiposGrua[CANT_POSIBILIDADES][TEXTO] = {
+        "Grua para moto",
+        "Grua liviana(auto)",
+        "Grua para camioneta"
+    };
     solicitudes_t solicitudes[CANT_SOLICITUDES];
 
     char ubicaciones[CANT_POSIBILIDADES][TEXTO] = {
@@ -132,7 +163,7 @@ int main() {
                 printf("Inicio de sesion correcto.\n");
                 printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre, perfiles[usuarioLogueado].apellido);
                 Sleep(2500);
-                menuChofer();
+                menuChofer(usuarioLogueado,choferes,ubicaciones,tiposGrua);
                 break;
             case PERFIL_CLIENTE:
                 system("cls");
@@ -202,7 +233,7 @@ int validaLogin(char usuario[], char password[],perfil_t perfiles[],int *usuario
     while (i<CANT_PERFILES && tipoUsuario == LOGIN_INCORRECTO){
         if(strcmp(usuario, perfiles[i].usuario)==0 && strcmp(password,perfiles[i].clave)==0){
             *usuarioLogueado=i;
-            tipoUsuario=perfiles[i].idPerfil;
+            tipoUsuario=perfiles[i].tipoPerfil;
         }
         i++;
     }
@@ -272,7 +303,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
         }
     }
 }
-
+/* MENU CLIENTE: OPCION - 1 */
 bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes, int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO])
 {
     int opcionUbicacion,opcionVehiculos,opcionSituacion, confirmar,i,prioridad;
@@ -508,7 +539,7 @@ void mostrarPrioridad(int prioridad)
             printf("Alta\n");
         }
 }
-
+/* MENU CLIENTES OPCION 2 : CONSULTA DE SOLICITUD*/
 void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantSolicitudes,char ubicacion [][TEXTO],char tipoVehiculo[][TEXTO],char situacion[][TEXTO])
 {   
     int i;
@@ -532,7 +563,7 @@ void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantS
             printf("-------------------------------------------\n");
             printf("Patente: %s\n",solicitudes[i].patente);
             printf("-------------------------------------------\n");
-            printf("Estado: ");
+            printf("Estado: \n");
             switch (solicitudes[i].estado)
             {
                 case SIN_SOLICITUD:
@@ -566,8 +597,8 @@ void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantS
          printf("No realizo ninguna solicitud\n");
         }
 }
-
-void menuChofer() {
+/* MENU CHOFER */
+void menuChofer(int usuarioLogueado,chofer_t choferes[], char ubicacion[][TEXTO], char tiposGrua[][TEXTO]) {
     int opcion=-1;
     while (opcion != 0){
         system("cls");
@@ -585,7 +616,8 @@ void menuChofer() {
 
         switch (opcion){
             case 1:
-                printf("Seleccionaste: Estado actual\n");
+                system("cls");
+                estadoActual(usuarioLogueado,choferes,ubicacion,tiposGrua);
                 system("pause");
                 break;
 
@@ -621,6 +653,90 @@ void menuChofer() {
         }
     }
 }
+/* MENU CHOFER OPCION 1 : CONSULTA DE ESTADO ACTUAL*/
+void estadoActual(int usuarioLogueado,chofer_t choferes[], char ubicacion[][TEXTO], char tiposGrua[][TEXTO])
+{
+    int opcionEstado, cambiarEstado;
+    int i, indiceChofer = -1;
+    system("cls");
+    printf("---------------------------------------------------------\n");
+    printf("                     Estado actual                        \n");
+    printf("Por defecto, el sistema le asignara estado: No disponible \n");
+	printf( "---------------------------------------------------------\n");
+    
+    for (i = 0; i < CANT_CHOFERES ; i++)
+    {
+        if (usuarioLogueado == choferes[i].idPerfil)
+        {
+            indiceChofer=i;
+        }
+
+    }
+
+    if (choferes[indiceChofer].estado == DISPONIBLE) 
+    {
+        printf("Estado: Disponible\n");
+    }else if (choferes[indiceChofer].estado == OCUPADO) 
+    {
+        printf("Estado: Ocupado\n");
+    }else
+        {
+            printf("Estado: No disponible\n");
+        }  
+    printf("........................................................\n");
+    
+    do{
+        printf("1 - Cambiar de estado. \n");
+        printf("2 - Volver al menu principal\n");
+        scanf("%d",&opcionEstado);
+        if (opcionEstado > 2 || opcionEstado < 1)
+        {   
+            system("cls");
+            printf("Por favor ingrese una opcion valida.\n");
+        }
+    }while (opcionEstado > 2 || opcionEstado < 1 );
+
+   if (opcionEstado == 1)
+   {
+        do{
+            system("cls");
+            printf("--------------------------------------\n");
+            printf("          CAMBIAR ESTADO              \n");
+            printf("--------------------------------------\n");
+            printf("1. Disponible\n");
+            printf("2. No disponible\n");
+            printf("3. Volver al menu principal\n");
+            printf("Ingrese una opcion: ");
+            scanf("%d",&cambiarEstado);
+            if(cambiarEstado < 1 || cambiarEstado > 3)
+            {
+                printf("La opcion ingresada no es valida. Por favor, intente nuevamente\n");
+            }
+        }while (cambiarEstado < 1 || cambiarEstado > 3 );
+
+        switch (cambiarEstado)
+        {
+            case 1: 
+                    choferes[indiceChofer].estado = DISPONIBLE; 
+                    printf("El estado ha sido cambiado. Su estado actual es: Disponible.\n");
+                    break;
+            case 2:
+                    if (choferes[indiceChofer].estado == NO_DISPONIBLE)
+                    {
+                        printf("Ya se encuentra en estado No Disponible.\n");
+                    }else{
+                        choferes[indiceChofer].estado = NO_DISPONIBLE;
+                        printf("El estado ha sido cambiado. Su estado actual es: No disponible.\n");
+                    }
+                    break;
+            case 3:
+                printf("Volviendo al menu anterior...\n");
+                Sleep(1500);
+                break;
+        }
+   }
+}
+
 void menuAdmin() {
     int opcion = -1;
 
