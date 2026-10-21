@@ -42,9 +42,10 @@ int validaLogin(char usuario[], char password[],perfil_t perfiles[],int *usuario
     return tipoUsuario;
 } 
 
-void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes,int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]) {
+void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[], chofer_t choferes[],int *cantSolicitudes,int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]) {
     int opcion=-1;
     int i;
+    int choferEncontrado;
     bool solicitudConfirmada;
     while (opcion != 0){
         system("cls");
@@ -66,7 +67,9 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolic
             case 1:
                 solicitudConfirmada=registrarSolicitud(usuarioLogueado,solicitudes,cantSolicitudes,cantCanceladas,ubicaciones,situaciones,tiposVehiculos);
                 if (solicitudConfirmada){
-                    printf("La solicitud fue confirmada aguarde y se le asignara un chofer\n");
+                    choferEncontrado = motorDeBusqueda(choferes, solicitudes, *cantSolicitudes);
+                    motorDeAsignacion(choferes, solicitudes, choferEncontrado, *cantSolicitudes - 1);
+
                 }
                 system("pause");
                 break;
@@ -236,13 +239,48 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],int *ca
     return confirmada;
 }
 
+int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[], int cantSolicitudes){
+    int buscaChofer = -1;
+    int i;
+    for (i = 0; i < CANT_CHOFERES; i++){
+        if (buscaChofer == -1){
+            if(choferes[i].estado == DISPONIBLE){
+                if(choferes[i].ubicacion == solicitudes[cantSolicitudes-1].ubicacion){
+                    if (choferes[i].tipoGrua ==solicitudes[cantSolicitudes-1].tipoVehiculo){
+                        buscaChofer = i;
+                    }
+                }
+            }
+        }
+        
+    }
+    return buscaChofer;
+}
+
+void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[], int choferEncontrado,int indiceSolicitud){
+ if (choferEncontrado != -1){
+        choferes[choferEncontrado].solicitudAsignada = indiceSolicitud;
+        choferes[choferEncontrado].estado = OCUPADO ;
+        solicitudes[indiceSolicitud].estado = CHOFER_ASIGNADO;
+        solicitudes[indiceSolicitud].choferAsignado = choferEncontrado;
+        printf("Su solicitud ha sido confirmada\n");
+        printf("Estado: chofer asignado\n");
+    } else {
+        solicitudes[indiceSolicitud].estado = SOLICITUD_PENDIENTE;
+        solicitudes[indiceSolicitud].choferAsignado = -1;
+        printf("Su solicitud ha sido registrada\n");
+        printf("Estado: solicitud pendiente\n");
+    }
+
+}
+
 int calcularPrioridad(void)
 {
     int opcionVia, opcionPeligro, opcionObstruye, opcionDetenido, puntaje, prioridad; 
     puntaje = 0;
     do{
         printf("En que tipo de via se encuentra? : \n");
-        printf("1 - Atuopista.\n");
+        printf("1 - Autopista.\n");
         printf("2 - Ruta.\n");
         printf("3 - Calle.\n");
         printf("Opcion: ");
@@ -341,6 +379,9 @@ void mostrarPrioridad(int prioridad)
             printf("Alta\n");
         }
 }
+
+
+
 /* MENU CLIENTES OPCION 2 : CONSULTA DE SOLICITUD*/
 void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantSolicitudes,char ubicacion [][TEXTO],char tipoVehiculo[][TEXTO],char situacion[][TEXTO])
 {   

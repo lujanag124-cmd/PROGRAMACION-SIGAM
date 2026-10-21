@@ -66,7 +66,7 @@ typedef struct{
 void mostrarBienvenida(void);
 void inicioSesion(char usuario[], char password[]);
 int validaLogin (char usuario[], char password[],perfil_t perfiles[],int *usuarioLogueado);
-void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],int *cantSolicitudes,int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]);
+void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[], chofer_t choferes[],int *cantSolicitudes,int *cantCanceladas, char ubicaciones[][TEXTO], char situaciones[][TEXTO],char tiposVehiculos[][TEXTO]);
 void menuChofer(int usuarioLogueado,chofer_t choferes[], char ubicacion[][TEXTO], char tiposGrua[][TEXTO]);
 void menuAdmin();
 void menuSoporte();
@@ -75,5 +75,6 @@ int calcularPrioridad(void);
 void mostrarPrioridad(int prioridad);
 void consultaSolicitud(int usuarioLogueado,solicitudes_t solicitudes[],int cantSolicitudes,char ubicacion [][TEXTO],char tiposVehiculos[][TEXTO],char situacion[][TEXTO]);
 void estadoActual(int usuarioLogueado,chofer_t choferes[], char ubicacion[][TEXTO], char tipoGrua[][TEXTO]);
-
+int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[], int cantSolicitudes);
+void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[], int choferEncontrado,int indiceSolicitud);
 #endif

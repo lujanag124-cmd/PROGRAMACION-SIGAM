@@ -17,7 +17,7 @@ int main() {
         {PERFIL_CLIENTE,"Omar", "Gomez","cliente2", "cliente123"},
         {PERFIL_CLIENTE,"Agustina", "Gonzalez", "cliente3", "cliente123"},
 
-        {PERFIL_ADMIN,"Gabriel","Avalos",  "admin1","admin123"},
+        {PERFIL_ADMIN,"Julian","Alvarez",  "admin1","admin123"},
         {PERFIL_SOPORTE,"Lionel","Messi",  "soporte1","soporte123"}
     };
 
@@ -96,7 +96,7 @@ int main() {
                 printf("Inicio de sesion correcto.\n");
                 printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre, perfiles[usuarioLogueado].apellido);
                 Sleep(2500);
-                menuCliente(usuarioLogueado,solicitudes,&cantSolicitudes,&cantCanceladas,ubicaciones,situaciones,tiposVehiculos);   
+                menuCliente(usuarioLogueado,solicitudes,choferes,&cantSolicitudes,&cantCanceladas,ubicaciones,situaciones,tiposVehiculos);   
                 break;
             case PERFIL_ADMIN:
                 system("cls");
