@@ -624,14 +624,24 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
       indiceChofer = i;
     }
   }
+  printf("Chofer con ID : %d\n",choferes[indiceChofer].idPerfil);
 
-  if (choferes[indiceChofer].estado == DISPONIBLE) {
-    printf("Estado: Disponible\n");
-  } else if (choferes[indiceChofer].estado == OCUPADO) {
-    printf("Estado: Ocupado\n");
-  } else {
-    printf("Estado: No disponible\n");
-  }
+    if (choferes[indiceChofer].estado == DISPONIBLE) 
+    {
+        printf("Estado: Disponible\n");
+    }else if (choferes[indiceChofer].estado == OCUPADO) 
+    {
+        printf("Estado: Ocupado\n");
+    }else
+        {
+            printf("Estado: No disponible\n");
+        }  
+    printf("Ubicacion Actual: %s\n",ubicacion[choferes[indiceChofer].ubicacion-1]);
+    printf("Cuenta con: %s\n",tiposGrua[choferes[indiceChofer].tipoGrua-1]);
+    if (choferes[indiceChofer].solicitudAsignada == -1)
+    {
+        printf("No posee ninguna solicitud\n");
+    }
   printf("........................................................\n");
 
   do {
