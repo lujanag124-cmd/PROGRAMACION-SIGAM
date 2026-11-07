@@ -57,11 +57,9 @@ int validaLogin(char usuario[], char password[], perfil_t perfiles[],
       // Acá adentro recién chequeamos si está Activo o Suspendido
       if (strcmp(perfiles[i].estado, "Activo") == 0) {
         *usuarioLogueado = i;
-        tipoUsuario =
-            perfiles[i].tipoPerfil;  // Devuelve el perfil correspondiente
+        tipoUsuario = perfiles[i].tipoPerfil;  // Devuelve el perfil correspondiente
       } else {
-        tipoUsuario =
-            LOGIN_SUSPENDIDO;  // Solo si coincide pero está suspendido
+        tipoUsuario = LOGIN_SUSPENDIDO;  // Solo si coincide pero está suspendido
       }
     }
     i++;
@@ -102,8 +100,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
             usuarioLogueado, solicitudes, cantSolicitudes, cantCanceladas,
             ubicaciones, situaciones, tiposVehiculos, estadosLocalidades);
         if (solicitudConfirmada) {
-          choferEncontrado =
-              motorDeBusqueda(choferes, solicitudes, *cantSolicitudes);
+          choferEncontrado = motorDeBusqueda(choferes, solicitudes, *cantSolicitudes-1);
           motorDeAsignacion(choferes, solicitudes, choferEncontrado,
                             *cantSolicitudes - 1);
         }
@@ -287,16 +284,16 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 
 /* Motor de búsqueda */
 int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[],
-                    int cantSolicitudes) {
+                    int indiceSolicitud) {
   int buscaChofer = -1;
   int i;
   for (i = 0; i < CANT_CHOFERES; i++) {
     if (buscaChofer == -1) {
       if (choferes[i].estado == DISPONIBLE) {
         if (choferes[i].ubicacion ==
-            solicitudes[cantSolicitudes - 1].ubicacion) {
+            solicitudes[indiceSolicitud].ubicacion) {
           if (choferes[i].tipoGrua ==
-              solicitudes[cantSolicitudes - 1].tipoVehiculo) {
+              solicitudes[indiceSolicitud].tipoVehiculo) {
             buscaChofer = i;
           }
         }
@@ -527,8 +524,9 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 /*                              MENU CHOFER                               */
 /*------------------------------------------------------------------------*/
 
-void menuChofer(int usuarioLogueado, chofer_t choferes[],
+void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitudes[],
                 char ubicaciones[][TEXTO], char tiposGrua[][TEXTO],
+                char tiposVehiculos[][TEXTO],char situaciones[][TEXTO],
                 reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[],
                 int estadosLocalidades[]) {
   int opcion = -1;
@@ -555,9 +553,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[],
 
       case 2:
         system("cls");
-        printf(
-            "Opcion temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
+        servicioAsignado(usuarioLogueado,choferes,solicitudes,perfiles,ubicaciones,tiposVehiculos,situaciones);
         printf("\n");
         system("pause");
         break;
@@ -682,6 +678,78 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
   }
 }
 
+void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
+                      solicitudes_t solicitudes[],perfil_t perfiles[],char ubicaciones[][TEXTO],
+                      char tiposVehiculos[][TEXTO],char situaciones[][TEXTO])
+{
+  int i, indiceChofer = -1;
+  int indiceSolicitud= -1;
+  int indiceCliente;
+  int opcion;
+  system("cls");
+  printf("-------------------------------------------------------------\n");
+  printf("                    Detalles del servicio                    \n");
+  printf(".............................................................\n");
+
+  for (i = 0; i < CANT_CHOFERES; i++) {
+    if (usuarioLogueado == choferes[i].idPerfil) {
+      indiceChofer = i;
+    }
+  }
+  indiceSolicitud=choferes[indiceChofer].solicitudAsignada;
+  
+  if (indiceSolicitud == -1) {
+    printf("No posee ninguna solicitud\n");
+  }else{
+      indiceCliente=solicitudes[indiceSolicitud].idCliente;
+      printf("Chofer con ID : %d\n", choferes[indiceChofer].idPerfil);
+      printf("-------------------------------------------------------------\n");
+      printf("Cliente: %s %s\n",perfiles[indiceCliente].nombre, perfiles[indiceCliente].apellido);
+      printf("Ubicacion del cliente: %s\n",ubicaciones[solicitudes[indiceSolicitud].ubicacion - 1]);
+      printf("El cliente tiene: %s\n", tiposVehiculos[solicitudes[indiceSolicitud].tipoVehiculo - 1]);
+      printf("La patente del vehiculo es: %s\n",solicitudes[indiceSolicitud].patente);
+      printf("Problema del cliente: %s\n", situaciones[solicitudes[indiceSolicitud].situacion -1]);
+      printf("Nivel de prioridad: ");
+      mostrarPrioridad(solicitudes[indiceSolicitud].prioridad);
+      printf("-------------------------------------------------------------\n");
+      do{
+      printf("1. Iniciar viaje\n");
+      printf("2. volver al menu principal\n");
+      printf("Ingrese una opción: ");
+      scanf("%d", &opcion);
+      }while (opcion > 2 || opcion <1);
+      switch (opcion){
+        case 1:
+                iniciarViaje(usuarioLogueado,choferes,solicitudes);
+                break;
+        case 2:
+                break;
+      }
+
+    }
+
+}
+
+void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[])
+{
+  int i, indiceChofer = -1;
+  int indiceSolicitud = -1;
+  for (i = 0; i < CANT_CHOFERES; i++) {
+    if (usuarioLogueado == choferes[i].idPerfil) {
+      indiceChofer = i;
+    }
+  }
+  indiceSolicitud=choferes[indiceChofer].solicitudAsignada;
+if (indiceSolicitud == -1){
+    printf("Usted no posee servicios.\n");
+  }else if (solicitudes[indiceSolicitud].estado == CHOFER_ASIGNADO){
+    solicitudes[indiceSolicitud].estado=VIAJE_INICIADO;
+    printf("El viaje inicio correctamente.\n");
+  }else if (solicitudes[indiceSolicitud].estado == VIAJE_INICIADO){
+    printf("El viaje ya fue iniciado.\n");
+  }
+
+}
 /* MENU CHOFER Y CLIENTE - OPCION: Contactar a soporte*/
 
 void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,

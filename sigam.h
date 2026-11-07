@@ -89,8 +89,9 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
                  int* cantReclamos, perfil_t perfiles[],
                  int estadosLocalidades[]);
 
-void menuChofer(int usuarioLogueado, chofer_t choferes[],
+void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitudes[],
                 char ubicaciones[][TEXTO], char tiposGrua[][TEXTO],
+                char tiposVehiculos[][TEXTO],char situaciones[][TEXTO],
                 reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[],
                 int estadosLocalidades[]);
 
@@ -105,7 +106,9 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
                         char tiposVehiculos[][TEXTO], int estadosLocalidades[]);
 
 int calcularPrioridad(void);
+
 void mostrarPrioridad(int prioridad);
+
 void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
                        int cantSolicitudes, char ubicacion[][TEXTO],
                        char tiposVehiculos[][TEXTO], char situacion[][TEXTO]);
@@ -115,10 +118,19 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
                   int estadosLocalidades[]);
 
 int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[],
-                    int cantSolicitudes);
+                    int indiceSolicitud);
+
 void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
                        int choferEncontrado, int indiceSolicitud);
+
+void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
+                      solicitudes_t solicitudes[],perfil_t perfiles[],char ubicaciones[][TEXTO],
+                      char tiposVehiculos[][TEXTO],char situaciones[][TEXTO]);
+
+void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[]);
+
 void mostrarSolicitudAuxilio(void);
+
 bool validarPatente(char patente[]);
 
 void menuSoporte(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,

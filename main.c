@@ -90,7 +90,7 @@ int main() {
         printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre,
                perfiles[usuarioLogueado].apellido);
         Sleep(2500);
-        menuChofer(usuarioLogueado, choferes, ubicaciones, tiposGrua, reclamos,
+        menuChofer(usuarioLogueado, choferes,solicitudes, ubicaciones, tiposGrua,tiposVehiculos,situaciones, reclamos,
                    &cantReclamos, perfiles, estadosLocalidades);
         break;
       case PERFIL_CLIENTE:
