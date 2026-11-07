@@ -77,7 +77,8 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
                  chofer_t choferes[], int* cantSolicitudes, int* cantCanceladas,
                  char ubicaciones[][TEXTO], char situaciones[][TEXTO],
                  char tiposVehiculos[][TEXTO], reclamo_t reclamos[],
-                 int* cantReclamos, perfil_t perfiles[]) {
+                 int* cantReclamos, perfil_t perfiles[],
+                 int estadosLocalidades[]) {
   int opcion = -1;
   int i;
   int choferEncontrado;
@@ -89,9 +90,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
     printf("====================================================\n");
     printf("1. Solicitar auxilio\n");
     printf("2. Consultar estado del viaje\n");
-    printf("3. Calificar servicio\n");
-    printf("4. Contactar a soporte\n");
-    printf("5. Ver historial\n");
+    printf("3. Contactar a soporte\n");
     printf("0. Cerrar sesion\n");
     printf("----------------------------------------------------\n");
     printf("Seleccione una opcion: ");
@@ -101,7 +100,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
       case 1:
         solicitudConfirmada = registrarSolicitud(
             usuarioLogueado, solicitudes, cantSolicitudes, cantCanceladas,
-            ubicaciones, situaciones, tiposVehiculos);
+            ubicaciones, situaciones, tiposVehiculos, estadosLocalidades);
         if (solicitudConfirmada) {
           choferEncontrado =
               motorDeBusqueda(choferes, solicitudes, *cantSolicitudes);
@@ -120,25 +119,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
         break;
 
       case 3:
-        system("cls");
-        printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
-        system("pause");
-        break;
-
-      case 4:
         hacerReclamo(usuarioLogueado, reclamos, cantReclamos, perfiles);
-        break;
-
-      case 5:
-        system("cls");
-        printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
-        system("pause");
         break;
 
       case 0:
@@ -159,7 +140,8 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
 bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
                         int* cantSolicitudes, int* cantCanceladas,
                         char ubicaciones[][TEXTO], char situaciones[][TEXTO],
-                        char tiposVehiculos[][TEXTO]) {
+                        char tiposVehiculos[][TEXTO],
+                        int estadosLocalidades[]) {
   int opcionUbicacion, opcionVehiculos, opcionSituacion, confirmar, i,
       prioridad;
   bool confirmada = false;
@@ -181,23 +163,30 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
   /* Verificar que exista espacio en el vector(que no haya superado la cantidad
    * de solicitudes) */
   if (puedeRegistrar == true && *cantSolicitudes >= CANT_SOLICITUDES) {
-    printf("No es posible registrar más solicitudes.\n");
+    printf("No es posible registrar mas solicitudes.\n");
     puedeRegistrar = false;
   }
   /*En caso de poder registrarse comienza con el cuestionario*/
   if (puedeRegistrar == true) {
     do {
       mostrarSolicitudAuxilio();
-      printf("Seleccione la ubicación\n");
+      printf("Seleccione la ubicacion\n");
       printf("1. Merlo\n");
       printf("2. Ituzaingo\n");
       printf("3. Moron\n");
       printf("Opcion: ");
       scanf("%d", &opcionUbicacion);
       if (opcionUbicacion < 1 || opcionUbicacion > 3) {
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
+      } else if (estadosLocalidades[opcionUbicacion - 1] == 0) {
+        printf("Esta localidad se encuentra suspendida.\n");
+        printf("Por favor, seleccione otra localidad.\n");
+        Sleep(3000);
+        system("cls");
+
+        opcionUbicacion = 0;
       }
     } while (opcionUbicacion < 1 || opcionUbicacion > 3);
     solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion;
@@ -205,14 +194,14 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 
     do {
       mostrarSolicitudAuxilio();
-      printf("Seleccione el tipo de vehículo\n");
+      printf("Seleccione el tipo de vehiculo\n");
       printf("1. Moto\n");
       printf("2. Auto\n");
       printf("3. Camioneta\n");
       printf("Opcion: ");
       scanf("%d", &opcionVehiculos);
       if (opcionVehiculos < 1 || opcionVehiculos > 3) {
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
       }
@@ -222,14 +211,14 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 
     do {
       mostrarSolicitudAuxilio();
-      printf("Seleccione la situación\n");
+      printf("Seleccione la situacion\n");
       printf("1. Pinchadura\n");
       printf("2. Falla mecánica\n");
       printf("3. Accidente/choque\n");
       printf("Opcion: ");
       scanf("%d", &opcionSituacion);
       if (opcionSituacion < 1 || opcionSituacion > 3) {
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
       }
@@ -260,9 +249,9 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
     printf("--------------------------------------\n");
     printf("     Los datos seleccionados son:     \n");
     printf("--------------------------------------\n");
-    printf("Ubicación: %s\n", ubicaciones[opcionUbicacion - 1]);
-    printf("Tipo de vehículo: %s\n", tiposVehiculos[opcionVehiculos - 1]);
-    printf("Situación: %s\n", situaciones[opcionSituacion - 1]);
+    printf("Ubicacion: %s\n", ubicaciones[opcionUbicacion - 1]);
+    printf("Tipo de vehiculo: %s\n", tiposVehiculos[opcionVehiculos - 1]);
+    printf("Situacion: %s\n", situaciones[opcionSituacion - 1]);
     printf("Patente: %s\n", solicitudes[*cantSolicitudes].patente);
     printf("Nivel de prioridad: ");
     mostrarPrioridad(prioridad);
@@ -276,7 +265,7 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
     system("cls");
 
     while (confirmar != 1 && confirmar != 2) {
-      printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+      printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
       printf("Opcion: ");
       scanf("%d", &confirmar);
     }
@@ -359,7 +348,7 @@ int calcularPrioridad(void) {
         puntaje;
         break;
       default:
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
         break;
@@ -382,7 +371,7 @@ int calcularPrioridad(void) {
         puntaje;
         break;
       default:
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
         break;
@@ -428,7 +417,7 @@ int calcularPrioridad(void) {
         puntaje;
         break;
       default:
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
         break;
@@ -453,8 +442,8 @@ void mostrarPrioridad(int prioridad) {
 bool validarPatente(char patente[]) {
   int i;
   // valida que el usuario haya ingresado exactamente 6 caracteres
-  if (strlen(patente) != 6) {  // strlen = tring length = longitud de la cadena,
-                               // cuenta cuantos caracteres hay
+  if (strlen(patente) != 6) {  // strlen = tring length = longitud de la
+                               // cadena, cuenta cuantos caracteres hay
     return false;
   }
   /*unsigned char: evita errores por caract. especiales */
@@ -491,14 +480,14 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
     if (solicitudes[i].idCliente == usuarioLogueado) {
       solicitudEncontrada = true;
       printf("-------------------------------------------\n");
-      printf("------------Estado de su solicitud---------\n");
+      printf("            Estado de su solicitud         \n");
       printf("-------------------------------------------\n");
       printf("\n");
       printf("Cliente ID N°: %d \n", solicitudes[i].idCliente);
-      printf("Ubicación: %s\n", ubicacion[solicitudes[i].ubicacion - 1]);
-      printf("Tipo de vehículo: %s\n",
+      printf("Ubicacion: %s\n", ubicacion[solicitudes[i].ubicacion - 1]);
+      printf("Tipo de vehiculo: %s\n",
              tipoVehiculo[solicitudes[i].tipoVehiculo - 1]);
-      printf("Situación: %s\n", situacion[solicitudes[i].situacion - 1]);
+      printf("Situacion: %s\n", situacion[solicitudes[i].situacion - 1]);
       printf("Patente: %s\n", solicitudes[i].patente);
       printf("Estado: ");
       switch (solicitudes[i].estado) {
@@ -507,7 +496,7 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
           break;
 
         case SOLICITUD_PENDIENTE:
-          printf("Pendiente de asignación\n");
+          printf("Pendiente de asignacion\n");
           break;
 
         case CHOFER_ASIGNADO:
@@ -529,7 +518,7 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
     }
   }
   if (solicitudEncontrada == false) {
-    printf("No realizó ninguna solicitud\n");
+    printf("No realizo ninguna solicitud\n");
   }
   printf("\n");
   printf("-------------------------------------------\n");
@@ -540,7 +529,8 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 
 void menuChofer(int usuarioLogueado, chofer_t choferes[],
                 char ubicaciones[][TEXTO], char tiposGrua[][TEXTO],
-                reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[]) {
+                reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[],
+                int estadosLocalidades[]) {
   int opcion = -1;
   while (opcion != 0) {
     system("cls");
@@ -551,7 +541,6 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[],
     printf("2. Servicio asignado\n");
     printf("3. Finalizar viaje\n");
     printf("4. Contactar a soporte\n");
-    printf("5. Historial de ganancias\n");
     printf("0. Cerrar sesion\n");
     printf("Seleccione una opcion: ");
     scanf("%d", &opcion);
@@ -559,14 +548,15 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[],
     switch (opcion) {
       case 1:
         system("cls");
-        estadoActual(usuarioLogueado, choferes, ubicaciones, tiposGrua);
+        estadoActual(usuarioLogueado, choferes, ubicaciones, tiposGrua,
+                     estadosLocalidades);
         system("pause");
         break;
 
       case 2:
         system("cls");
         printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
+            "Opcion temporalmente fuera de servicio. Disculpe las "
             "molestias.\n");
         printf("\n");
         system("pause");
@@ -575,7 +565,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[],
       case 3:
         system("cls");
         printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
+            "Opcion temporalmente fuera de servicio. Disculpe las "
             "molestias.\n");
         printf("\n");
         system("pause");
@@ -583,15 +573,6 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[],
 
       case 4:
         hacerReclamo(usuarioLogueado, reclamos, cantReclamos, perfiles);
-        break;
-
-      case 5:
-        system("cls");
-        printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
-        system("pause");
         break;
 
       case 0:
@@ -607,9 +588,11 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[],
     }
   }
 }
+
 /* MENU CHOFER OPCION 1: ESTADO ACTUAL*/
 void estadoActual(int usuarioLogueado, chofer_t choferes[],
-                  char ubicacion[][TEXTO], char tiposGrua[][TEXTO]) {
+                  char ubicacion[][TEXTO], char tiposGrua[][TEXTO],
+                  int estadosLocalidades[]) {
   int opcionEstado, cambiarEstado;
   int i, indiceChofer = -1;
   system("cls");
@@ -624,24 +607,21 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
       indiceChofer = i;
     }
   }
-  printf("Chofer con ID : %d\n",choferes[indiceChofer].idPerfil);
+  printf("Chofer con ID : %d\n", choferes[indiceChofer].idPerfil);
 
-    if (choferes[indiceChofer].estado == DISPONIBLE) 
-    {
-        printf("Estado: Disponible\n");
-    }else if (choferes[indiceChofer].estado == OCUPADO) 
-    {
-        printf("Estado: Ocupado\n");
-    }else
-        {
-            printf("Estado: No disponible\n");
-        }  
-    printf("Ubicacion Actual: %s\n",ubicacion[choferes[indiceChofer].ubicacion-1]);
-    printf("Cuenta con: %s\n",tiposGrua[choferes[indiceChofer].tipoGrua-1]);
-    if (choferes[indiceChofer].solicitudAsignada == -1)
-    {
-        printf("No posee ninguna solicitud\n");
-    }
+  if (choferes[indiceChofer].estado == DISPONIBLE) {
+    printf("Estado: Disponible\n");
+  } else if (choferes[indiceChofer].estado == OCUPADO) {
+    printf("Estado: Ocupado\n");
+  } else {
+    printf("Estado: No disponible\n");
+  }
+  printf("Ubicacion Actual: %s\n",
+         ubicacion[choferes[indiceChofer].ubicacion - 1]);
+  printf("Cuenta con: %s\n", tiposGrua[choferes[indiceChofer].tipoGrua - 1]);
+  if (choferes[indiceChofer].solicitudAsignada == -1) {
+    printf("No posee ninguna solicitud\n");
+  }
   printf("........................................................\n");
 
   do {
@@ -649,7 +629,7 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
     printf("2. Volver al menú principal\n");
     scanf("%d", &opcionEstado);
     if (opcionEstado > 2 || opcionEstado < 1) {
-      printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+      printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
       Sleep(3000);
       system("cls");
     }
@@ -667,7 +647,7 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
       printf("Ingrese una opción: ");
       scanf("%d", &cambiarEstado);
       if (cambiarEstado < 1 || cambiarEstado > 3) {
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
       }
@@ -675,9 +655,14 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
 
     switch (cambiarEstado) {
       case 1:
-        choferes[indiceChofer].estado = DISPONIBLE;
-        printf(
-            "El estado ha sido cambiado. Su estado actual es: Disponible.\n");
+        if (estadosLocalidades[choferes[indiceChofer].ubicacion - 1] == 0) {
+          printf("No puede ponerse disponible.\n");
+          printf("Su localidad se encuentra suspendida.\n");
+        } else {
+          choferes[indiceChofer].estado = DISPONIBLE;
+          printf(
+              "El estado ha sido cambiado. Su estado actual es: Disponible.\n");
+        }
         break;
       case 2:
         if (choferes[indiceChofer].estado == NO_DISPONIBLE) {
@@ -697,7 +682,7 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
   }
 }
 
-/* MENU CHOFER Y CLIENTE - OPCION 4: Contactar a soporte*/
+/* MENU CHOFER Y CLIENTE - OPCION: Contactar a soporte*/
 
 void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
                   perfil_t perfiles[]) {
@@ -709,7 +694,7 @@ void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
   // Validación si supera la cantidad de reclamos declarados
   if (*cantReclamos >= CANT_RECLAMOS) {
     system("cls");
-    printf("El sistema de reclamos ha alcanzado su límite máximo.\n");
+    printf("El sistema de reclamos ha alcanzado su limite maximo.\n");
     system("pause");
     return;
   }
@@ -723,36 +708,38 @@ void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
     printf("Por favor, complete los campos - Presione ENTER para continuar \n");
     printf("---------------------------------------------------------------\n");
 
-    printf("Ingrese el título del reclamo: ");
-    // %[^\n]: Lee y guarda todo lo que el usuario escriba, excepto^ cuando
-    // detecte que presionó un Enter \n
-    scanf(" %[^\n]", tituloReclamo);
+    printf("Ingrese el titulo del reclamo: ");
+    fflush(stdin);
+    scanf("%[^\n]", tituloReclamo);
 
-    if (strlen(tituloReclamo) == 0) {
+    if (strlen(tituloReclamo) == 1) {
       printf(
-          "\nLa opción no puede estar incompleta. Por favor, intente "
+          "\nLa opcion no puede estar incompleta. Por favor, intente "
           "nuevamente.\n");
       Sleep(3000);
     }
   } while (strlen(tituloReclamo) ==
-           0);  // si da 0, es porque está vacío el texto
+           1);  // si da 0, es porque está vacío el texto
 
   // 2. Ingresar el nombre del usuario acusado
   do {
     system("cls");
+
     printf("===============================================================\n");
     printf("                         Contactar a Soporte                   \n");
     printf("===============================================================\n");
     printf("Por favor, complete los campos - Presione ENTER para continuar \n");
     printf("---------------------------------------------------------------\n");
-    printf("Título del reclamo: %s\n", tituloReclamo);
+
+    printf("Titulo del reclamo: %s\n", tituloReclamo);
 
     printf("Ingrese el nombre completo del usuario acusado: ");
-    scanf(" %[^\n]", acusadoReclamo);
+    fflush(stdin);
+    scanf("%[^\n]", acusadoReclamo);
 
     if (strlen(acusadoReclamo) == 0) {
       printf(
-          "\nLa opción no puede estar incompleta. Por favor, intente "
+          "\nLa opcion no puede estar incompleta. Por favor, intente "
           "nuevamente.\n");
       Sleep(3000);
     }
@@ -767,11 +754,12 @@ void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
     printf("Detalle su reclamo o consulta. (Máximo %d caracteres)\n",
            limiteCaracteres);
     printf("---------------------------------------------------------------\n");
-    printf("Título del reclamo: %s\n", tituloReclamo);
+    printf("Titulo del reclamo: %s\n", tituloReclamo);
     printf("Usuario acusado: %s\n", acusadoReclamo);
 
     printf("Contenido del mensaje: ");
-    scanf(" %[^\n]", contenidoMensaje);
+    fflush(stdin);
+    scanf("%[^\n]", contenidoMensaje);
 
     // validación de texto, no puede superar los carac. establecidos.
     int limTexto = strlen(contenidoMensaje);
@@ -786,7 +774,7 @@ void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
             "El mensaje es muy breve. Por favor, describa su problema con "
             "mayor detalle\n");
       } else {
-        printf("Superó el límite de %d caracteres (escribió %d).\n",
+        printf("Supero el limite de %d caracteres (escribio %d).\n",
                limiteCaracteres, limTexto);
       }
       Sleep(3000);
@@ -814,7 +802,7 @@ void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
   system("cls");
   printf("---------------------------------------------------------------\n");
   printf(
-      "¡Mensaje enviado con éxito! Nuestra área de Soporte se contactará con "
+      "Mensaje enviado con exito. Nuestra area de Soporte se contactara con "
       "usted.\n");
   printf("---------------------------------------------------------------\n");
   system("pause");
@@ -825,7 +813,8 @@ void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
 /*                         MENU ADMINISTRADOR                             */
 /*------------------------------------------------------------------------*/
 
-void menuAdmin() {
+void menuAdmin(perfil_t perfiles[], char ubicaciones[][TEXTO],
+               int estadosLocalidades[]) {
   int opcion = -1;
 
   while (opcion != 0) {
@@ -836,7 +825,6 @@ void menuAdmin() {
     printf("====================================================\n");
     printf("1. Gestionar usuarios\n");
     printf("2. Gestionar localidades\n");
-    printf("3. Consultar estadisticas\n");
     printf("0. Cerrar sesion\n");
     printf("Seleccione una opcion: ");
     scanf("%d", &opcion);
@@ -844,31 +832,13 @@ void menuAdmin() {
     switch (opcion) {
       case 1:
         system("cls");
-        printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
-        system("pause");
+        gestionarEstadoUsuarios(perfiles);
         break;
 
       case 2:
         system("cls");
-        printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
-        system("pause");
+        gestionarLocalidades(ubicaciones, estadosLocalidades);
         break;
-
-      case 3:
-        system("cls");
-        printf(
-            "Opción temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
-        system("pause");
-        break;
-
       case 0:
         system("cls");
         printf("Cerrando sesion...\n");
@@ -950,10 +920,10 @@ void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos) {
       for (i = 0; i < cantReclamos; i++) {
         if (strcmp(reclamos[i].estado, "Pendiente") == 0) {
           hayPendientes = true;
-          printf("Reclamo N°: %d\n", i + 1);
+          printf("Reclamo Nro: %d\n", i + 1);
           printf("Enviado por: %s\n", reclamos[i].tipoUsuario);
           printf("Estado: %s\n", reclamos[i].estado);
-          printf("Título: %s\n", reclamos[i].titulo);
+          printf("Titulo: %s\n", reclamos[i].titulo);
           printf("Usuario acusado: %s\n", reclamos[i].acusado);
           printf("Mensaje: %s\n", reclamos[i].mensaje);
           printf("---------------------------------------------------------\n");
@@ -973,7 +943,7 @@ void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos) {
       scanf("%d", &opcionMenu);
 
       if (opcionMenu == 1) {
-        printf("\nIngrese el número de reclamo a gestionar: ");
+        printf("\nIngrese el numero de reclamo a gestionar: ");
         scanf("%d", &numReclamo);
 
         if (numReclamo >= 1 && numReclamo <= cantReclamos &&
@@ -981,24 +951,25 @@ void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos) {
           system("cls");
           printf(
               "----------------------------------------------------------\n");
-          printf("       GESTIÓN DE RESOLUCIÓN (Reclamo N° %d)              \n",
-                 numReclamo);
+          printf(
+              "       GESTION DE RESOLUCION (Reclamo Nro %d)              \n",
+              numReclamo);
           printf(
               "----------------------------------------------------------\n");
-          printf("Ingrese el comentario o resolución para este reclamo: ");
+          printf("Ingrese el comentario o resolucion para este reclamo: ");
           scanf(" %[^\n]", comentarioSoporte);
 
           if (strlen(comentarioSoporte) > 0) {
             strcpy(reclamos[numReclamo - 1].respuesta, comentarioSoporte);
             strcpy(reclamos[numReclamo - 1].estado, "Validado");
-            printf("\n¡Reclamo procesado y validado con éxito!\n");
+            printf("\nReclamo procesado y validado con exito.\n");
             Sleep(2000);
           } else {
-            printf("\nEl comentario no puede estar vacío.\n");
+            printf("\nEl comentario no puede estar vacio.\n");
             Sleep(2000);
           }
         } else {
-          printf("\nNúmero de reclamo inválido o inexistente.\n");
+          printf("\nNumero de reclamo invalido o inexistente.\n");
           Sleep(2000);
         }
       }
@@ -1006,7 +977,7 @@ void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos) {
   }
 }
 
-/*MENU SOPORTE - Opción 2: Gestionar usuarios*/
+/*MENU SOPORTE / Admin - Opción: Gestionar usuarios*/
 void gestionarEstadoUsuarios(perfil_t perfiles[]) {
   int opcionTipoUsuario = 0, numUsuario, opcionSubMenu;
 
@@ -1033,15 +1004,19 @@ void gestionarEstadoUsuarios(perfil_t perfiles[]) {
         printf("--------------------------------------------------------\n");
         // recorre los perfiles del sistema
         int i;
+        int contador = 1;
+
         for (i = 0; i < CANT_PERFILES; i++) {
           // valida si la opción elegida corresponde a chofer o cliente
           if ((opcionTipoUsuario == 1 &&
                perfiles[i].tipoPerfil == PERFIL_CHOFER) ||
               (opcionTipoUsuario == 2 &&
                perfiles[i].tipoPerfil == PERFIL_CLIENTE)) {
-            printf("Perfil Nro. %d | Nombre: %s %s | Estado: %s\n", i,
+            printf("Perfil Nro. %d | Nombre: %s %s | Estado: %s\n", contador,
                    perfiles[i].nombre, perfiles[i].apellido,
                    perfiles[i].estado);
+
+            contador++;
           }
         }
 
@@ -1052,36 +1027,46 @@ void gestionarEstadoUsuarios(perfil_t perfiles[]) {
         scanf("%d", &opcionSubMenu);
 
         if (opcionSubMenu == 1) {
-          printf("--------------------------------------------------------\n");
-          printf("\nIngrese el N° de usuario a modificar: ");
+          int contador = 0;
+          int indiceUsuario = -1;
+          int i;
+
+          printf("------------------------------------------\n");
+          printf("Ingrese el Nro. de usuario a modificar: ");
           scanf("%d", &numUsuario);
 
-          if (numUsuario >= 0 && numUsuario < CANT_PERFILES) {
-            // Validamos que el perfil pertenezca al perfil actual
-            int pertenecePerfil =
-                (opcionTipoUsuario == 1 &&
-                 perfiles[numUsuario].tipoPerfil == PERFIL_CHOFER) ||
+          // Buscamos el usuario seleccionado
+          for (i = 0; i < CANT_PERFILES; i++) {
+            if ((opcionTipoUsuario == 1 &&
+                 perfiles[i].tipoPerfil == PERFIL_CHOFER) ||
                 (opcionTipoUsuario == 2 &&
-                 perfiles[numUsuario].tipoPerfil == PERFIL_CLIENTE);
+                 perfiles[i].tipoPerfil == PERFIL_CLIENTE)) {
+              contador++;
 
-            if (pertenecePerfil) {
-              // Compara dos textos para ver si son iguales, si es = da 0
-              if (strcmp(perfiles[numUsuario].estado, "Activo") == 0) {
-                // Copia el texto dentro de otro
-                strcpy(perfiles[numUsuario].estado, "Suspendido");
-                printf("\n¡Usuario suspendido con exito!\n");
-              } else {
-                strcpy(perfiles[numUsuario].estado, "Activo");
-                printf("\n¡Usuario activado con exito!\n");
+              if (contador == numUsuario) {
+                indiceUsuario = i;
+                break;
               }
-            } else {
-              printf("\nNumero de usuario inválido. \n");
             }
-            Sleep(2000);
-          } else {
-            printf("\nOpcion invalida. Intente nuevamente.\n");
-            Sleep(2000);
           }
+
+          // Verificamos si encontramos al usuario
+          if (indiceUsuario != -1) {
+            if (strcmp(perfiles[indiceUsuario].estado, "Activo") == 0) {
+              strcpy(perfiles[indiceUsuario].estado, "Suspendido");
+              printf("\nUsuario suspendido con exito!\n");
+
+            } else {
+              strcpy(perfiles[indiceUsuario].estado, "Activo");
+              printf("\nUsuario activado con exito!\n");
+            }
+
+          } else {
+            printf("\nNumero de usuario invalido.\n");
+          }
+
+          Sleep(2000);
+          continue;
         }
       }
     }
@@ -1123,4 +1108,70 @@ void verHistorialReclamos(reclamo_t reclamos[], int cantReclamos) {
 
   printf("\n");
   system("pause");
+}
+/* MENU ADMINISTRADOR - OPCION 2: GESTIONAR LOCALIDADES */
+
+void gestionarLocalidades(char ubicaciones[][TEXTO], int estadosLocalidades[]) {
+  int i;
+  int opcion = 0;
+  int numLocalidad;
+
+  while (opcion != 2) {
+    system("cls");
+
+    printf("========================================\n");
+    printf("        GESTION DE LOCALIDADES          \n");
+    printf("========================================\n");
+
+    // Mostrar localidades y sus estados
+    for (i = 0; i < CANT_POSIBILIDADES; i++) {
+      printf("%d. %s | Estado: ", i + 1, ubicaciones[i]);
+
+      if (estadosLocalidades[i] == 1) {
+        printf("Activa\n");
+      } else {
+        printf("Suspendida\n");
+      }
+    }
+
+    printf("----------------------------------------\n");
+    printf("1. Cambiar estado de una localidad\n");
+    printf("2. Volver al menu Administrador\n");
+    printf("Seleccione una opcion: ");
+    scanf("%d", &opcion);
+
+    switch (opcion) {
+      case 1:
+        printf("\nIngrese el numero de localidad: ");
+        scanf("%d", &numLocalidad);
+
+        if (numLocalidad >= 1 && numLocalidad <= CANT_POSIBILIDADES) {
+          i = numLocalidad - 1;
+
+          if (estadosLocalidades[i] == 1) {
+            estadosLocalidades[i] = 0;
+            printf("\nLocalidad suspendida con exito!\n");
+          } else {
+            estadosLocalidades[i] = 1;
+            printf("\nLocalidad activada con exito!\n");
+          }
+
+        } else {
+          printf("\nNumero de localidad invalido.\n");
+        }
+
+        Sleep(2000);
+        break;
+
+      case 2:
+        printf("\nVolviendo al menu Administrador...\n");
+        Sleep(1500);
+        break;
+
+      default:
+        printf("\nOpcion incorrecta.\n");
+        Sleep(2000);
+        break;
+    }
+  }
 }

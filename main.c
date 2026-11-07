@@ -30,6 +30,7 @@ int main() {
   solicitudes_t solicitudes[CANT_SOLICITUDES];
 
   char ubicaciones[CANT_POSIBILIDADES][TEXTO] = {"Merlo", "Ituzaingo", "Moron"};
+  int estadosLocalidades[CANT_POSIBILIDADES] = {1, 1, 1};
 
   char tiposVehiculos[CANT_POSIBILIDADES][TEXTO] = {"Moto", "Auto",
                                                     "Camioneta"};
@@ -85,34 +86,34 @@ int main() {
     switch (valorUsuario) {
       case PERFIL_CHOFER:
         system("cls");
-        printf("Inicio de sesión exitoso.\n");
+        printf("Inicio de sesion exitoso.\n");
         printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre,
                perfiles[usuarioLogueado].apellido);
         Sleep(2500);
         menuChofer(usuarioLogueado, choferes, ubicaciones, tiposGrua, reclamos,
-                   &cantReclamos, perfiles);
+                   &cantReclamos, perfiles, estadosLocalidades);
         break;
       case PERFIL_CLIENTE:
         system("cls");
-        printf("Inicio de sesión exitoso.\n");
+        printf("Inicio de sesion exitoso.\n");
         printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre,
                perfiles[usuarioLogueado].apellido);
         Sleep(2500);
         menuCliente(usuarioLogueado, solicitudes, choferes, &cantSolicitudes,
                     &cantCanceladas, ubicaciones, situaciones, tiposVehiculos,
-                    reclamos, &cantReclamos, perfiles);
+                    reclamos, &cantReclamos, perfiles, estadosLocalidades);
         break;
       case PERFIL_ADMIN:
         system("cls");
-        printf("Inicio de sesión exitoso.\n");
+        printf("Inicio de sesion exitoso.\n");
         printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre,
                perfiles[usuarioLogueado].apellido);
         Sleep(1500);
-        menuAdmin();
+        menuAdmin(perfiles, ubicaciones, estadosLocalidades);
         break;
       case PERFIL_SOPORTE:
         system("cls");
-        printf("Inicio de sesión exitoso.\n");
+        printf("Inicio de sesion exitoso.\n");
         printf("Bienvenido/a  %s %s\n", perfiles[usuarioLogueado].nombre,
                perfiles[usuarioLogueado].apellido);
         Sleep(1500);
@@ -127,7 +128,7 @@ int main() {
       printf("Desea volver a iniciar sesion?\n");
       printf("1- Si\n");
       printf("0- No, quiero cerrar el sistema SIGAM\n");
-      printf("Opción: ");
+      printf("Opcion: ");
       scanf("%d", &continuar);
       system("cls");
     } while (continuar < 0 || continuar > 1);

@@ -81,41 +81,53 @@ void mostrarBienvenida(void);
 void inicioSesion(char usuario[], char password[]);
 int validaLogin(char usuario[], char password[], perfil_t perfiles[],
                 int* usuarioLogueado);
+
 void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
                  chofer_t choferes[], int* cantSolicitudes, int* cantCanceladas,
                  char ubicaciones[][TEXTO], char situaciones[][TEXTO],
                  char tiposVehiculos[][TEXTO], reclamo_t reclamos[],
-                 int* cantReclamos, perfil_t perfiles[]);
+                 int* cantReclamos, perfil_t perfiles[],
+                 int estadosLocalidades[]);
+
 void menuChofer(int usuarioLogueado, chofer_t choferes[],
                 char ubicaciones[][TEXTO], char tiposGrua[][TEXTO],
-                reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[]);
-void menuAdmin();
-void menuSoporte();
+                reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[],
+                int estadosLocalidades[]);
+
+void menuAdmin(perfil_t perfiles[], char ubicaciones[][TEXTO],
+               int estadosLocalidades[]);
+
+void gestionarLocalidades(char ubicaciones[][TEXTO], int estadosLocalidades[]);
+
 bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
                         int* cantSolicitudes, int* cantCanceladas,
                         char ubicaciones[][TEXTO], char situaciones[][TEXTO],
-                        char tiposVehiculos[][TEXTO]);
+                        char tiposVehiculos[][TEXTO], int estadosLocalidades[]);
+
 int calcularPrioridad(void);
 void mostrarPrioridad(int prioridad);
 void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
                        int cantSolicitudes, char ubicacion[][TEXTO],
                        char tiposVehiculos[][TEXTO], char situacion[][TEXTO]);
+
 void estadoActual(int usuarioLogueado, chofer_t choferes[],
-                  char ubicacion[][TEXTO], char tipoGrua[][TEXTO]);
+                  char ubicacion[][TEXTO], char tipoGrua[][TEXTO],
+                  int estadosLocalidades[]);
+
 int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[],
                     int cantSolicitudes);
 void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
                        int choferEncontrado, int indiceSolicitud);
 void mostrarSolicitudAuxilio(void);
 bool validarPatente(char patente[]);
+
 void menuSoporte(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
                  perfil_t perfiles[]);
+
 void contactarSoporte(char tipoUsuarioActual[], reclamo_t reclamos[],
                       int* cantReclamos);
 void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos);
 void gestionarEstadoUsuarios(perfil_t perfiles[]);
-void verHistorialReclamos(reclamo_t reclamos[], int cantReclamos);
-void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos);
 void verHistorialReclamos(reclamo_t reclamos[], int cantReclamos);
 void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
                   perfil_t perfiles[]);
