@@ -41,7 +41,7 @@ int main() {
   reclamo_t reclamos[CANT_RECLAMOS];
   int cantReclamos = 0;
 
-  char usuario[50], password[50];
+  char usuario[TEXTO], password[TEXTO];
   int valorUsuario, cantSolicitudes = 0, cantCanceladas = 0;
   int usuarioLogueado = -1;
 

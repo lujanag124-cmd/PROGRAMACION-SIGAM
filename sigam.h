@@ -150,4 +150,5 @@ void gestionarEstadoUsuarios(perfil_t perfiles[]);
 void verHistorialReclamos(reclamo_t reclamos[], int cantReclamos);
 void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
                   perfil_t perfiles[]);
+int ingresarClave(char clave[], int tam);
 #endif
