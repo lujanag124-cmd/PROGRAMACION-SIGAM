@@ -321,6 +321,24 @@ void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
   }
 }
 
+int buscarSolicitudPendiente(chofer_t choferes[], solicitudes_t solicitudes[], int cantSolicitudes, int choferLogueado){
+  int solicitudEncontrada = -1;
+  int mayorPuntaje = -1;
+  int i;
+
+  for (i = 0; i<cantSolicitudes; i++){
+    if (solicitudes[i].estado == SOLICITUD_PENDIENTE){
+      if (choferes[choferLogueado].ubicacion == solicitudes[i].ubicacion){
+        if(solicitudes[i].prioridad > mayorPuntaje){
+          mayorPuntaje= solicitudes[i].prioridad;
+          solicitudEncontrada= i;
+        }
+      }
+    }
+  }
+  return solicitudEncontrada;
+}
+
 /*Calculo de prioridad según cuestionario*/
 int calcularPrioridad(void) {
   int opcionVia, opcionPeligro, opcionObstruye, opcionDetenido, puntaje,
@@ -528,7 +546,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
                 char ubicaciones[][TEXTO], char tiposGrua[][TEXTO],
                 char tiposVehiculos[][TEXTO],char situaciones[][TEXTO],
                 reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[],
-                int estadosLocalidades[]) {
+                int estadosLocalidades[], int cantSolicitudes) {
   int opcion = -1;
   while (opcion != 0) {
     system("cls");
@@ -547,7 +565,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
       case 1:
         system("cls");
         estadoActual(usuarioLogueado, choferes, ubicaciones, tiposGrua,
-                     estadosLocalidades);
+                     estadosLocalidades,solicitudes, cantSolicitudes);
         system("pause");
         break;
 
@@ -560,10 +578,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
 
       case 3:
         system("cls");
-        printf(
-            "Opcion temporalmente fuera de servicio. Disculpe las "
-            "molestias.\n");
-        printf("\n");
+        finalizarViaje(usuarioLogueado, choferes, solicitudes, cantSolicitudes);
         system("pause");
         break;
 
@@ -588,9 +603,10 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
 /* MENU CHOFER OPCION 1: ESTADO ACTUAL*/
 void estadoActual(int usuarioLogueado, chofer_t choferes[],
                   char ubicacion[][TEXTO], char tiposGrua[][TEXTO],
-                  int estadosLocalidades[]) {
+                  int estadosLocalidades[],solicitudes_t solicitudes[], int cantSolicitudes) {
   int opcionEstado, cambiarEstado;
   int i, indiceChofer = -1;
+  int indicePendiente = -1;
   system("cls");
   printf("-------------------------------------------------------------\n");
   printf("                        Estado actual                        \n");
@@ -656,8 +672,11 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
           printf("Su localidad se encuentra suspendida.\n");
         } else {
           choferes[indiceChofer].estado = DISPONIBLE;
-          printf(
-              "El estado ha sido cambiado. Su estado actual es: Disponible.\n");
+          printf("El estado ha sido cambiado. Su estado actual es: Disponible.\n");
+          indicePendiente= buscarSolicitudPendiente(choferes, solicitudes, cantSolicitudes, indiceChofer);
+          if (indicePendiente != -1){
+            motorDeAsignacion(choferes, solicitudes, indiceChofer,indicePendiente);
+          }
         }
         break;
       case 2:
@@ -749,6 +768,72 @@ if (indiceSolicitud == -1){
     printf("El viaje ya fue iniciado.\n");
   }
 
+}
+
+void finalizarViaje(int usuarioLogueado, chofer_t choferes[],
+                    solicitudes_t solicitudes[], int cantSolicitudes) {
+    int i;
+    int indiceChofer = -1;
+    int solicitudEncontrada = -1;
+
+    bool tieneViajeActivo = false;
+    bool viajeFinalizado = false;
+    bool viajePendiente = false;    
+
+    //Buscamos el indice del chofer que inicio sesion 
+    for(i=0; i< CANT_CHOFERES; i++){
+      if(choferes[i].idPerfil == usuarioLogueado){
+        indiceChofer= i;
+      }
+    }
+
+    //Verificamos que el chofer exista y que haya solicitudes
+    if (indiceChofer != -1 && cantSolicitudes > 0){
+      for(i=0; i < cantSolicitudes; i++){
+        //Verificamos si la solicitud pertenece al chofer logueado
+        if(solicitudes[i].choferAsignado == indiceChofer){
+          //si el viaje esta inciado podemos finalizarlo
+          if(solicitudes[i].estado == VIAJE_INICIADO){
+            solicitudes[i]. estado = VIAJE_FINALIZADO;
+            choferes[indiceChofer].estado = DISPONIBLE;
+            choferes[indiceChofer].solicitudAsignada = -1;
+
+            viajeFinalizado = true;
+            tieneViajeActivo = true;
+          }else {
+            //si esta asignado pero todavia no fue iniciado
+            if(solicitudes[i].estado == CHOFER_ASIGNADO){
+              viajePendiente=true;
+              tieneViajeActivo=true;
+            }
+          }
+        }
+      }
+
+    }
+    //si finalizamos el viaje, buscamos otra solicitud pendiente
+    if(viajeFinalizado){
+      solicitudEncontrada = buscarSolicitudPendiente(   choferes, solicitudes, cantSolicitudes, indiceChofer);
+      if(solicitudEncontrada != -1){
+        motorDeAsignacion(choferes, solicitudes, indiceChofer, solicitudEncontrada);
+      }
+    }
+    system("cls");
+
+    //Mostramos mensaje correspondiente
+    if(!tieneViajeActivo){
+      printf("No tiene viajes asignados para finalizar\n");
+    } else {
+        if(viajeFinalizado){
+          printf("Viaje finalizado con exito\n");
+        } else {
+            if(viajePendiente){
+             printf("El viaje aun no fue inciado\n");
+             printf("Por favor, inicie el viaje para poder finalizarlo\n");
+            }
+        }
+    }
+    system("pause");
 }
 /* MENU CHOFER Y CLIENTE - OPCION: Contactar a soporte*/
 

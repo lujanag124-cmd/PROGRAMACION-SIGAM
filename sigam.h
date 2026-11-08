@@ -93,7 +93,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
                 char ubicaciones[][TEXTO], char tiposGrua[][TEXTO],
                 char tiposVehiculos[][TEXTO],char situaciones[][TEXTO],
                 reclamo_t reclamos[], int* cantReclamos, perfil_t perfiles[],
-                int estadosLocalidades[]);
+                int estadosLocalidades[],int cantSolicitudes);
 
 void menuAdmin(perfil_t perfiles[], char ubicaciones[][TEXTO],
                int estadosLocalidades[]);
@@ -115,19 +115,26 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 
 void estadoActual(int usuarioLogueado, chofer_t choferes[],
                   char ubicacion[][TEXTO], char tipoGrua[][TEXTO],
-                  int estadosLocalidades[]);
+                  int estadosLocalidades[],solicitudes_t solicitudes[], int cantSolicitudes);
 
 int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[],
                     int indiceSolicitud);
 
 void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
                        int choferEncontrado, int indiceSolicitud);
+int buscarSolicitudPendiente(chofer_t choferes[],
+                             solicitudes_t solicitudes[],
+                             int cantSolicitudes,
+                             int choferLogueado);
 
 void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
                       solicitudes_t solicitudes[],perfil_t perfiles[],char ubicaciones[][TEXTO],
                       char tiposVehiculos[][TEXTO],char situaciones[][TEXTO]);
 
 void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[]);
+
+void finalizarViaje(int usuarioLogueado, chofer_t choferes[],
+                   solicitudes_t solicitudes[], int cantSolicitudes);
 
 void mostrarSolicitudAuxilio(void);
 

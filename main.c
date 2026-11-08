@@ -91,7 +91,7 @@ int main() {
                perfiles[usuarioLogueado].apellido);
         Sleep(2500);
         menuChofer(usuarioLogueado, choferes,solicitudes, ubicaciones, tiposGrua,tiposVehiculos,situaciones, reclamos,
-                   &cantReclamos, perfiles, estadosLocalidades);
+                   &cantReclamos, perfiles, estadosLocalidades,cantSolicitudes);
         break;
       case PERFIL_CLIENTE:
         system("cls");
