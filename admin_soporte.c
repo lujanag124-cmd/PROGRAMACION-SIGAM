@@ -132,7 +132,7 @@ void gestionarEstadoUsuarios(perfil_t perfiles[]) {
               strcpy(perfiles[indiceUsuario].estado, "Activo");
               printf("\nUsuario activado con exito!\n");
             }
-
+            guardarPerfiles(perfiles);
           } else {
             printf("\nNumero de usuario invalido.\n");
           }

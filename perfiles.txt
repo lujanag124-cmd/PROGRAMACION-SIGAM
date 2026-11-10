@@ -1,0 +1,8 @@
+2 Carlos Rodriguez chofer1 chofer123 Activo
+2 Sandra Sanchez chofer2 chofer123 Activo
+2 Pablo Escobar chofer3 chofer123 Suspendido
+1 Tomas Escobar cliente1 cliente123 Activo
+1 Omar Gomez cliente2 cliente123 Activo
+1 Agustina Gonzalez cliente3 cliente123 Activo
+3 Julian Alvarez admin1 admin123 Activo
+4 Lionel Messi soporte1 soporte123 Activo

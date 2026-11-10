@@ -20,11 +20,21 @@ int main() {
       {PERFIL_ADMIN, "Julian", "Alvarez", "admin1", "admin123", "Activo"},
       {PERFIL_SOPORTE, "Lionel", "Messi", "soporte1", "soporte123", "Activo"}};
 
+  int cantidadPerfiles = cargarPerfiles(perfiles);
+
+  if (cantidadPerfiles == 0) {
+      guardarPerfiles(perfiles);
+  }
   chofer_t choferes[CANT_CHOFERES] = {
       {0, NO_DISPONIBLE, MERLO, GRUA_MOTO, -1},
       {1, NO_DISPONIBLE, ITUZAINGO, GRUA_AUTO, -1},
       {2, NO_DISPONIBLE, MORON, GRUA_CAMIONETA, -1}};
+  
+  int cantidadChoferes = cargarChoferes(choferes);
 
+  if (cantidadChoferes == 0) {
+    guardarChoferes(choferes);
+  }
   char tiposGrua[CANT_POSIBILIDADES][TEXTO] = {
       "Grua para moto", "Grua liviana(auto)", "Grua para camioneta"};
   solicitudes_t solicitudes[CANT_SOLICITUDES];
@@ -44,7 +54,7 @@ int main() {
   char usuario[TEXTO], password[TEXTO];
   int valorUsuario, cantSolicitudes = 0, cantCanceladas = 0;
   int usuarioLogueado = -1;
-
+  cantSolicitudes = cargarSolicitudes(solicitudes);
   // system("pause"); equivalente a esperar tecla
   // system("cls"); equivalente a limpiar pantalla
   // Sleep(3000); // 3 segundos   este es para esperar X segundos, se escribe en

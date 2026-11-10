@@ -117,7 +117,7 @@ int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[],
 
 /*Motor de asignación*/
 void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
-                       int choferEncontrado, int indiceSolicitud) {
+                       int choferEncontrado, int indiceSolicitud, int cantSolicitudes) {
   if (choferEncontrado != -1) {
     choferes[choferEncontrado].solicitudAsignada = indiceSolicitud;
     choferes[choferEncontrado].estado = OCUPADO;
@@ -131,6 +131,8 @@ void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
     printf("Su solicitud ha sido registrada\n");
     printf("Estado: solicitud pendiente\n");
   }
+  guardarChoferes(choferes);
+  guardarSolicitudes(solicitudes, cantSolicitudes);
 }
 
 int buscarSolicitudPendiente(chofer_t choferes[], solicitudes_t solicitudes[], int cantSolicitudes, int choferLogueado){

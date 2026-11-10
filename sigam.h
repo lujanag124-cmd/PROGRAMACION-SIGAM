@@ -1,6 +1,6 @@
 #ifndef SIGAM_H
 #define SIGAM_H
-
+#include <stdio.h>
 #include <stdbool.h>
 
 // Constantes
@@ -121,7 +121,7 @@ int motorDeBusqueda(chofer_t choferes[], solicitudes_t solicitudes[],
                     int indiceSolicitud);
 
 void motorDeAsignacion(chofer_t choferes[], solicitudes_t solicitudes[],
-                       int choferEncontrado, int indiceSolicitud);
+                       int choferEncontrado, int indiceSolicitud,int cantSolicitudes);
 int buscarSolicitudPendiente(chofer_t choferes[],
                              solicitudes_t solicitudes[],
                              int cantSolicitudes,
@@ -129,9 +129,9 @@ int buscarSolicitudPendiente(chofer_t choferes[],
 
 void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
                       solicitudes_t solicitudes[],perfil_t perfiles[],char ubicaciones[][TEXTO],
-                      char tiposVehiculos[][TEXTO],char situaciones[][TEXTO]);
+                      char tiposVehiculos[][TEXTO],char situaciones[][TEXTO],int cantSolicitudes);
 
-void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[]);
+void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[],int cantSolicitudes);
 
 void finalizarViaje(int usuarioLogueado, chofer_t choferes[],
                    solicitudes_t solicitudes[], int cantSolicitudes);
@@ -151,4 +151,14 @@ void verHistorialReclamos(reclamo_t reclamos[], int cantReclamos);
 void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
                   perfil_t perfiles[]);
 int ingresarClave(char clave[], int tam);
+
+//funciones para persistencia de datos
+void guardarPerfiles(perfil_t perfiles[]);
+int cargarPerfiles(perfil_t perfiles[]);
+
+void guardarChoferes(chofer_t choferes[]);
+int cargarChoferes(chofer_t choferes[]);
+
+void guardarSolicitudes(solicitudes_t solicitudes[], int cantSolicitudes);
+int cargarSolicitudes(solicitudes_t solicitudes[]);
 #endif

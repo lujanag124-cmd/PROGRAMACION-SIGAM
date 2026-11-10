@@ -40,7 +40,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
         if (solicitudConfirmada) {
           choferEncontrado = motorDeBusqueda(choferes, solicitudes, *cantSolicitudes-1);
           motorDeAsignacion(choferes, solicitudes, choferEncontrado,
-                            *cantSolicitudes - 1);
+                            *cantSolicitudes - 1,*cantSolicitudes);
         }
         system("pause");
         break;
@@ -210,6 +210,7 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
       solicitudes[*cantSolicitudes].estado = SOLICITUD_PENDIENTE;
       solicitudes[*cantSolicitudes].choferAsignado = -1;
       (*cantSolicitudes)++;
+      guardarSolicitudes(solicitudes, *cantSolicitudes);
       confirmada = true;
     } else {
       (*cantCanceladas)++;
@@ -434,7 +435,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
 
       case 2:
         system("cls");
-        servicioAsignado(usuarioLogueado,choferes,solicitudes,perfiles,ubicaciones,tiposVehiculos,situaciones);
+        servicioAsignado(usuarioLogueado,choferes,solicitudes,perfiles,ubicaciones,tiposVehiculos,situaciones,cantSolicitudes);
         printf("\n");
         system("pause");
         break;
@@ -538,7 +539,7 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
           printf("El estado ha sido cambiado. Su estado actual es: Disponible.\n");
           indicePendiente= buscarSolicitudPendiente(choferes, solicitudes, cantSolicitudes, indiceChofer);
           if (indicePendiente != -1){
-            motorDeAsignacion(choferes, solicitudes, indiceChofer,indicePendiente);
+            motorDeAsignacion(choferes, solicitudes, indiceChofer,indicePendiente,cantSolicitudes);
           }
         }
         break;
@@ -557,6 +558,8 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
         Sleep(1500);
         break;
     }
+     guardarChoferes(choferes);
+     guardarSolicitudes(solicitudes, cantSolicitudes);
   }
 }
 
@@ -564,7 +567,7 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
 
 void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
                       solicitudes_t solicitudes[],perfil_t perfiles[],char ubicaciones[][TEXTO],
-                      char tiposVehiculos[][TEXTO],char situaciones[][TEXTO])
+                      char tiposVehiculos[][TEXTO],char situaciones[][TEXTO],int cantSolicitudes)
 {
   int i, indiceChofer = -1;
   int indiceSolicitud= -1;
@@ -604,7 +607,7 @@ void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
       }while (opcion > 2 || opcion <1);
       switch (opcion){
         case 1:
-                iniciarViaje(usuarioLogueado,choferes,solicitudes);
+                iniciarViaje(usuarioLogueado,choferes,solicitudes,cantSolicitudes);
                 break;
         case 2:
                 break;
@@ -614,7 +617,7 @@ void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
 
 }
 
-void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[])
+void iniciarViaje(int usuarioLogueado, chofer_t choferes[],solicitudes_t solicitudes[],int cantSolicitudes)
 {
   int i, indiceChofer = -1;
   int indiceSolicitud = -1;
@@ -629,6 +632,7 @@ if (indiceSolicitud == -1){
   }else if (solicitudes[indiceSolicitud].estado == CHOFER_ASIGNADO){
     solicitudes[indiceSolicitud].estado=VIAJE_INICIADO;
     printf("El viaje inicio correctamente.\n");
+    guardarSolicitudes(solicitudes, cantSolicitudes);
   }else if (solicitudes[indiceSolicitud].estado == VIAJE_INICIADO){
     printf("El viaje ya fue iniciado.\n");
   }
@@ -681,7 +685,7 @@ void finalizarViaje(int usuarioLogueado, chofer_t choferes[],
     if(viajeFinalizado){
       solicitudEncontrada = buscarSolicitudPendiente(   choferes, solicitudes, cantSolicitudes, indiceChofer);
       if(solicitudEncontrada != -1){
-        motorDeAsignacion(choferes, solicitudes, indiceChofer, solicitudEncontrada);
+        motorDeAsignacion(choferes, solicitudes, indiceChofer, solicitudEncontrada,cantSolicitudes);
       }
     }
     system("cls");
@@ -699,5 +703,6 @@ void finalizarViaje(int usuarioLogueado, chofer_t choferes[],
             }
         }
     }
-    system("pause");
+     guardarChoferes(choferes);
+     guardarSolicitudes(solicitudes, cantSolicitudes);
 }
