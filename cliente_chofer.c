@@ -48,7 +48,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
       case 2:
         printf("Seleccionaste: Consultar estado de la solicitud\n");
         system("cls");
-        consultaSolicitud(usuarioLogueado, solicitudes, *cantSolicitudes,
+        consultaSolicitud(usuarioLogueado, solicitudes,choferes, perfiles, *cantSolicitudes,
                           ubicaciones, tiposVehiculos, situaciones);
         system("pause");
         break;
@@ -222,13 +222,16 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
 }
 
 /* MENU CLIENTES OPCION 2 : CONSULTA DE SOLICITUD*/
-void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
-                       int cantSolicitudes, char ubicacion[][TEXTO],
+void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[], chofer_t choferes[],
+                       perfil_t perfiles[], int cantSolicitudes, char ubicacion[][TEXTO],
                        char tipoVehiculo[][TEXTO], char situacion[][TEXTO]) {
   int i;
+  int indiceChofer = -1;
+  int indicePerfil = -1;
   bool solicitudEncontrada = false;
   for (i = 0; i < cantSolicitudes; i++) {
-    if (solicitudes[i].idCliente == usuarioLogueado) {
+    if (solicitudes[i].idCliente == usuarioLogueado && ( solicitudes[i].estado == SOLICITUD_PENDIENTE 
+        || solicitudes[i].estado == CHOFER_ASIGNADO || solicitudes[i].estado == VIAJE_INICIADO ) ) {
       solicitudEncontrada = true;
       printf("-------------------------------------------\n");
       printf("            Estado de su solicitud         \n");
@@ -251,7 +254,7 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
           break;
 
         case CHOFER_ASIGNADO:
-          printf("Chofer asignado\n");
+          printf("Chofer Asignado\n");
           break;
 
         case VIAJE_INICIADO:
@@ -265,11 +268,16 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
         default:
           printf("Estado desconocido\n");
           break;
+        }
+        if (solicitudes[i].choferAsignado != -1){
+        indiceChofer=solicitudes[i].choferAsignado;
+        indicePerfil=choferes[indiceChofer].idPerfil;
+        printf("Nombre y Apellido del chofer: %s %s\n",perfiles[indicePerfil].nombre, perfiles[indicePerfil].apellido);
+        }
       }
     }
-  }
   if (solicitudEncontrada == false) {
-    printf("No realizo ninguna solicitud\n");
+    printf("No posee ninguna solicitud activa\n");
   }
   printf("\n");
   printf("-------------------------------------------\n");
@@ -531,10 +539,12 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
 
     switch (cambiarEstado) {
       case 1:
-        if (estadosLocalidades[choferes[indiceChofer].ubicacion - 1] == 0) {
+        if (choferes[indiceChofer].solicitudAsignada != -1 ){
+          printf("Usted ya se encuentra con un servicio en curso\n");
+        } else if(estadosLocalidades[choferes[indiceChofer].ubicacion - 1] == 0) {
           printf("No puede ponerse disponible.\n");
           printf("Su localidad se encuentra suspendida.\n");
-        } else {
+        }else {
           choferes[indiceChofer].estado = DISPONIBLE;
           printf("El estado ha sido cambiado. Su estado actual es: Disponible.\n");
           indicePendiente= buscarSolicitudPendiente(choferes, solicitudes, cantSolicitudes, indiceChofer);
@@ -544,7 +554,9 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
         }
         break;
       case 2:
-        if (choferes[indiceChofer].estado == NO_DISPONIBLE) {
+        if (choferes[indiceChofer].solicitudAsignada != -1 ){
+          printf("Usted ya se encuentra con un servicio en curso\n");
+        } else if (choferes[indiceChofer].estado == NO_DISPONIBLE) {
           printf("Ya se encuentra en estado No Disponible.\n");
         } else {
           choferes[indiceChofer].estado = NO_DISPONIBLE;

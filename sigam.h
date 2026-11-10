@@ -109,8 +109,8 @@ int calcularPrioridad(void);
 
 void mostrarPrioridad(int prioridad);
 
-void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
-                       int cantSolicitudes, char ubicacion[][TEXTO],
+void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],chofer_t choferes[],
+                       perfil_t perfiles[],int cantSolicitudes, char ubicacion[][TEXTO],
                        char tiposVehiculos[][TEXTO], char situacion[][TEXTO]);
 
 void estadoActual(int usuarioLogueado, chofer_t choferes[],

@@ -143,9 +143,11 @@ int buscarSolicitudPendiente(chofer_t choferes[], solicitudes_t solicitudes[], i
   for (i = 0; i<cantSolicitudes; i++){
     if (solicitudes[i].estado == SOLICITUD_PENDIENTE){
       if (choferes[choferLogueado].ubicacion == solicitudes[i].ubicacion){
-        if(solicitudes[i].prioridad > mayorPuntaje){
-          mayorPuntaje= solicitudes[i].prioridad;
-          solicitudEncontrada= i;
+        if (choferes[choferLogueado].tipoGrua == solicitudes[i].tipoVehiculo){
+          if(solicitudes[i].prioridad > mayorPuntaje){
+            mayorPuntaje= solicitudes[i].prioridad;
+            solicitudEncontrada= i;
+          }
         }
       }
     }
