@@ -166,6 +166,8 @@ int calcularPrioridad(void) {
     printf("1 - Autopista\n");
     printf("2 - Ruta\n");
     printf("3 - Calle\n");
+    printf("-------------------------------------------\n");
+    printf("4 - Cancelar Solicitud\n");
     printf("Opcion: ");
     scanf("%d", &opcionVia);
     switch (opcionVia) {
@@ -176,7 +178,9 @@ int calcularPrioridad(void) {
         puntaje = puntaje + 1;
         break;
       case 3:
-        puntaje;
+        break;
+      case 4:
+        puntaje= -1;
         break;
       default:
         printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
@@ -184,76 +188,91 @@ int calcularPrioridad(void) {
         system("cls");
         break;
     }
-  } while (opcionVia < 1 || opcionVia > 3);
+  } while (opcionVia < 1 || opcionVia > 4);
   system("cls");
-
-  do {
-    mostrarSolicitudAuxilio();
-    printf("Se encuentra en una zona peligrosa?: \n");
-    printf("1 - Si\n");
-    printf("2 - No\n");
-    printf("Opcion: ");
-    scanf("%d", &opcionPeligro);
-    switch (opcionPeligro) {
-      case 1:
-        puntaje = puntaje + 3;
-        break;
-      case 2:
-        puntaje;
-        break;
-      default:
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
-        system("cls");
-        break;
-    }
-  } while (opcionPeligro < 1 || opcionPeligro > 2);
+if (puntaje != -1){
+    do {
+      mostrarSolicitudAuxilio();
+      printf("Se encuentra en una zona peligrosa?: \n");
+      printf("1 - Si\n");
+      printf("2 - No\n");
+      printf("-------------------------------------------\n");
+      printf("3 - Cancelar Solicitud\n");
+      printf("Opcion: ");
+      scanf("%d", &opcionPeligro);
+      switch (opcionPeligro) {
+        case 1:
+          puntaje = puntaje + 3;
+          break;
+        case 2:
+          break;
+        case 3:
+          puntaje = -1;
+          break;
+        default:
+          printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
+          Sleep(3000);
+          system("cls");
+          break;
+      }
+    } while (opcionPeligro < 1 || opcionPeligro > 3);
+}
   system("cls");
-
-  do {
-    mostrarSolicitudAuxilio();
-    printf("Se encuentra obstruyendo la circulacion?: \n");
-    printf("1 - Si\n");
-    printf("2 - No\n");
-    printf("Opcion: ");
-    scanf("%d", &opcionObstruye);
-    switch (opcionObstruye) {
-      case 1:
-        puntaje = puntaje + 2;
-        break;
-      case 2:
-        puntaje;
-        break;
-      default:
-        printf("Opción incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
-        system("cls");
-        break;
-    }
-  } while (opcionObstruye < 1 || opcionObstruye > 2);
+if (puntaje != -1){
+    do {
+      mostrarSolicitudAuxilio();
+      printf("Se encuentra obstruyendo la circulacion?: \n");
+      printf("1 - Si\n");
+      printf("2 - No\n");
+      printf("-------------------------------------------\n");
+      printf("3 - Cancelar Solicitud\n");
+      printf("Opcion: ");
+      scanf("%d", &opcionObstruye);
+      switch (opcionObstruye) {
+        case 1:
+          puntaje = puntaje + 2;
+          break;
+        case 2:
+          break;
+        case 3: 
+          puntaje = -1;
+          break;
+        default:
+          printf("Opción incorrecta. Por favor, intente nuevamente.\n");
+          Sleep(3000);
+          system("cls");
+          break;
+      }
+    } while (opcionObstruye < 1 || opcionObstruye > 3);   
+}
   system("cls");
-
-  do {
-    mostrarSolicitudAuxilio();
-    printf("Su vehiculo esta totalmente detenido?: \n");
-    printf("1 - Si\n");
-    printf("2 - No\n");
-    printf("Opcion: ");
-    scanf("%d", &opcionDetenido);
-    switch (opcionDetenido) {
-      case 1:
-        puntaje = puntaje + 2;
-        break;
-      case 2:
-        puntaje;
-        break;
-      default:
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
-        system("cls");
-        break;
-    }
-  } while (opcionDetenido < 1 || opcionDetenido > 2);
+if (puntaje != -1){
+    do {
+      mostrarSolicitudAuxilio();
+      printf("Su vehiculo esta totalmente detenido?: \n");
+      printf("1 - Si\n");
+      printf("2 - No\n");
+      printf("-------------------------------------------\n");
+      printf("3 - Cancelar Solicitud\n");
+      printf("Opcion: ");
+      scanf("%d", &opcionDetenido);
+      switch (opcionDetenido) {
+        case 1:
+          puntaje = puntaje + 2;
+          break;
+        case 2:
+          break;
+        case 3:
+          puntaje = -1;
+          break;
+        default:
+          printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
+          Sleep(3000);
+          system("cls");
+          break;
+      }
+    } while (opcionDetenido < 1 || opcionDetenido > 3);
+}
   system("cls");
   prioridad = puntaje;
   return prioridad;

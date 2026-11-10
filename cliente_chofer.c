@@ -103,29 +103,35 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
   }
   /*En caso de poder registrarse comienza con el cuestionario*/
   if (puedeRegistrar == true) {
-    do {
-      mostrarSolicitudAuxilio();
-      printf("Seleccione la ubicacion\n");
-      printf("1. Merlo\n");
-      printf("2. Ituzaingo\n");
-      printf("3. Moron\n");
-      printf("Opcion: ");
-      scanf("%d", &opcionUbicacion);
-      if (opcionUbicacion < 1 || opcionUbicacion > 3) {
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
-        system("cls");
-      } else if (estadosLocalidades[opcionUbicacion - 1] == 0) {
-        printf("Esta localidad se encuentra suspendida.\n");
-        printf("Por favor, seleccione otra localidad.\n");
-        Sleep(3000);
-        system("cls");
-
-        opcionUbicacion = 0;
-      }
-    } while (opcionUbicacion < 1 || opcionUbicacion > 3);
-    solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion;
-    system("cls");
+    do{
+        mostrarSolicitudAuxilio();
+        printf("Seleccione la ubicacion\n");
+        printf("1. Merlo\n");
+        printf("2. Ituzaingo\n");
+        printf("3. Moron\n");
+        printf("-------------------------------------------\n");
+        printf("4. Cancelar Solicitud\n");
+        printf("Opcion: ");
+        scanf("%d", &opcionUbicacion);
+        if (opcionUbicacion < 1 || opcionUbicacion > 4) {
+          printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
+          Sleep(3000);
+          system("cls");
+          } else   if (opcionUbicacion==4){
+            system("cls");
+            (*cantCanceladas)++;
+            printf("La solicitud fue cancelada.\n");
+            return false;
+            } else if (estadosLocalidades[opcionUbicacion - 1] == 0) {
+              printf("Esta localidad se encuentra suspendida.\n");
+              printf("Por favor, seleccione otra localidad.\n");
+              Sleep(3000);
+              system("cls");
+              opcionUbicacion = 0;
+            }
+    } while (opcionUbicacion < 1 || opcionUbicacion > 4);
+      solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion;
+      system("cls");
 
     do {
       mostrarSolicitudAuxilio();
@@ -133,14 +139,21 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
       printf("1. Moto\n");
       printf("2. Auto\n");
       printf("3. Camioneta\n");
+      printf("-------------------------------------------\n");
+      printf("4. Cancelar Solicitud\n");
       printf("Opcion: ");
       scanf("%d", &opcionVehiculos);
-      if (opcionVehiculos < 1 || opcionVehiculos > 3) {
+      if (opcionVehiculos < 1 || opcionVehiculos > 4) {
         printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
-      }
-    } while (opcionVehiculos < 1 || opcionVehiculos > 3);
+      } else if (opcionVehiculos==4){
+            system("cls");
+            (*cantCanceladas)++;
+            printf("La solicitud fue cancelada.\n");
+            return false;
+            }
+    } while (opcionVehiculos < 1 || opcionVehiculos > 4);
     solicitudes[*cantSolicitudes].tipoVehiculo = opcionVehiculos;
     system("cls");
 
@@ -150,14 +163,21 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
       printf("1. Pinchadura\n");
       printf("2. Falla mecánica\n");
       printf("3. Accidente/choque\n");
+      printf("-------------------------------------------\n");
+      printf("4. Cancelar Solicitud\n");
       printf("Opcion: ");
       scanf("%d", &opcionSituacion);
-      if (opcionSituacion < 1 || opcionSituacion > 3) {
+      if (opcionSituacion < 1 || opcionSituacion > 4) {
         printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
         Sleep(3000);
         system("cls");
-      }
-    } while (opcionSituacion < 1 || opcionSituacion > 3);
+      } else   if (opcionSituacion==4){
+            (*cantCanceladas)++;
+            system("cls");
+            printf("La solicitud fue cancelada.\n");
+            return false;
+            }
+    } while (opcionSituacion < 1 || opcionSituacion > 4);
     solicitudes[*cantSolicitudes].situacion = opcionSituacion;
 
     system("cls");
@@ -179,6 +199,12 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
     } while (!validarPatente(solicitudes[*cantSolicitudes].patente));
 
     prioridad = calcularPrioridad();
+    if (prioridad == -1){
+        (*cantCanceladas)++;
+        system("cls");
+        printf("La solicitud fue cancelada.\n");
+        return false;
+    }
     solicitudes[*cantSolicitudes].prioridad = prioridad;
 
     printf("--------------------------------------\n");
