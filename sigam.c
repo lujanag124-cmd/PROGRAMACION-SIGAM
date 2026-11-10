@@ -160,7 +160,6 @@ int calcularPrioridad(void) {
   int opcionVia, opcionPeligro, opcionObstruye, opcionDetenido, puntaje,
       prioridad;
   puntaje = 0;
-  do {
     mostrarSolicitudAuxilio();
     printf("En que tipo de via se encuentra?: \n");
     printf("1 - Autopista\n");
@@ -168,8 +167,7 @@ int calcularPrioridad(void) {
     printf("3 - Calle\n");
     printf("-------------------------------------------\n");
     printf("4 - Cancelar Solicitud\n");
-    printf("Opcion: ");
-    scanf("%d", &opcionVia);
+    opcionVia = validarMenuGenerico(1, 4);
     switch (opcionVia) {
       case 1:
         puntaje = puntaje + 3;
@@ -182,24 +180,16 @@ int calcularPrioridad(void) {
       case 4:
         puntaje= -1;
         break;
-      default:
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
-        system("cls");
-        break;
     }
-  } while (opcionVia < 1 || opcionVia > 4);
   system("cls");
 if (puntaje != -1){
-    do {
       mostrarSolicitudAuxilio();
       printf("Se encuentra en una zona peligrosa?: \n");
       printf("1 - Si\n");
       printf("2 - No\n");
       printf("-------------------------------------------\n");
       printf("3 - Cancelar Solicitud\n");
-      printf("Opcion: ");
-      scanf("%d", &opcionPeligro);
+      opcionPeligro = validarMenuGenerico(1, 3);
       switch (opcionPeligro) {
         case 1:
           puntaje = puntaje + 3;
@@ -209,25 +199,17 @@ if (puntaje != -1){
         case 3:
           puntaje = -1;
           break;
-        default:
-          printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-          Sleep(3000);
-          system("cls");
-          break;
       }
-    } while (opcionPeligro < 1 || opcionPeligro > 3);
 }
   system("cls");
 if (puntaje != -1){
-    do {
       mostrarSolicitudAuxilio();
       printf("Se encuentra obstruyendo la circulacion?: \n");
       printf("1 - Si\n");
       printf("2 - No\n");
       printf("-------------------------------------------\n");
       printf("3 - Cancelar Solicitud\n");
-      printf("Opcion: ");
-      scanf("%d", &opcionObstruye);
+      opcionObstruye = validarMenuGenerico(1, 3);
       switch (opcionObstruye) {
         case 1:
           puntaje = puntaje + 2;
@@ -237,25 +219,17 @@ if (puntaje != -1){
         case 3: 
           puntaje = -1;
           break;
-        default:
-          printf("Opción incorrecta. Por favor, intente nuevamente.\n");
-          Sleep(3000);
-          system("cls");
-          break;
-      }
-    } while (opcionObstruye < 1 || opcionObstruye > 3);   
+      } 
 }
   system("cls");
 if (puntaje != -1){
-    do {
       mostrarSolicitudAuxilio();
       printf("Su vehiculo esta totalmente detenido?: \n");
       printf("1 - Si\n");
       printf("2 - No\n");
       printf("-------------------------------------------\n");
       printf("3 - Cancelar Solicitud\n");
-      printf("Opcion: ");
-      scanf("%d", &opcionDetenido);
+      opcionDetenido = validarMenuGenerico(1, 3);
       switch (opcionDetenido) {
         case 1:
           puntaje = puntaje + 2;
@@ -265,13 +239,7 @@ if (puntaje != -1){
         case 3:
           puntaje = -1;
           break;
-        default:
-          printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-          Sleep(3000);
-          system("cls");
-          break;
       }
-    } while (opcionDetenido < 1 || opcionDetenido > 3);
 }
   system("cls");
   prioridad = puntaje;
@@ -320,4 +288,65 @@ bool validarPatente(char patente[]) {
   return true;
 }
 
+int validarMenuGenerico(int minimo, int maximo){
+    char entrada[TEXTO];
+    bool esValido = false;
+    bool esNumero;
+    int opcionElegida = -1;
+    int i;
 
+    do {
+        printf("\nIngrese una opcion (%d al %d): ", minimo, maximo);
+        scanf("%29s", entrada);
+
+        /* Convertir la entrada a minúsculas */
+        for (i = 0; i < strlen(entrada); i++) {
+            entrada[i] = tolower(entrada[i]);
+        }
+
+        /* Comprobar si contiene solamente números */
+        esNumero = true;
+
+        if (strlen(entrada) == 0) {
+            esNumero = false;
+        } else {
+            for (i = 0; i < strlen(entrada); i++) {
+                if (entrada[i] < '0' || entrada[i] > '9') {
+                    esNumero = false;
+                }
+            }
+        }
+
+        /* Convertir la entrada */
+        if (esNumero == true) {
+            opcionElegida = atoi(entrada);
+        } else {
+            if (strcmp(entrada, "cero") == 0) {
+                opcionElegida = 0;
+            } else if (strcmp(entrada, "uno") == 0) {
+                opcionElegida = 1;
+            } else if (strcmp(entrada, "dos") == 0) {
+                opcionElegida = 2;
+            } else if (strcmp(entrada, "tres") == 0) {
+                opcionElegida = 3;
+            } else if (strcmp(entrada, "cuatro") == 0) {
+                opcionElegida = 4;
+            } else if (strcmp(entrada, "cinco") == 0) {
+                opcionElegida = 5;
+            } else {
+                opcionElegida = -1;
+            }
+        }
+
+        /* Comprobar el rango permitido */
+        if (opcionElegida >= minimo && opcionElegida <= maximo) {
+            esValido = true;
+        } else {
+            printf("Error. Ingrese una opcion entre %d y %d.\n",
+                   minimo, maximo);
+        }
+
+    } while (esValido == false);
+
+    return opcionElegida;
+}

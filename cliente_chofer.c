@@ -111,13 +111,8 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
         printf("3. Moron\n");
         printf("-------------------------------------------\n");
         printf("4. Cancelar Solicitud\n");
-        printf("Opcion: ");
-        scanf("%d", &opcionUbicacion);
-        if (opcionUbicacion < 1 || opcionUbicacion > 4) {
-          printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-          Sleep(3000);
-          system("cls");
-          } else   if (opcionUbicacion==4){
+        opcionUbicacion = validarMenuGenerico(1, 4);
+        if (opcionUbicacion==4){
             system("cls");
             (*cantCanceladas)++;
             printf("La solicitud fue cancelada.\n");
@@ -129,11 +124,10 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
               system("cls");
               opcionUbicacion = 0;
             }
-    } while (opcionUbicacion < 1 || opcionUbicacion > 4);
+    } while (opcionUbicacion==0);
       solicitudes[*cantSolicitudes].ubicacion = opcionUbicacion;
       system("cls");
 
-    do {
       mostrarSolicitudAuxilio();
       printf("Seleccione el tipo de vehiculo\n");
       printf("1. Moto\n");
@@ -141,23 +135,16 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
       printf("3. Camioneta\n");
       printf("-------------------------------------------\n");
       printf("4. Cancelar Solicitud\n");
-      printf("Opcion: ");
-      scanf("%d", &opcionVehiculos);
-      if (opcionVehiculos < 1 || opcionVehiculos > 4) {
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
+      opcionVehiculos = validarMenuGenerico(1, 4);
+      if (opcionVehiculos==4){
         system("cls");
-      } else if (opcionVehiculos==4){
-            system("cls");
-            (*cantCanceladas)++;
-            printf("La solicitud fue cancelada.\n");
-            return false;
-            }
-    } while (opcionVehiculos < 1 || opcionVehiculos > 4);
+        (*cantCanceladas)++;
+        printf("La solicitud fue cancelada.\n");
+        return false;
+        }
     solicitudes[*cantSolicitudes].tipoVehiculo = opcionVehiculos;
     system("cls");
 
-    do {
       mostrarSolicitudAuxilio();
       printf("Seleccione la situacion\n");
       printf("1. Pinchadura\n");
@@ -165,19 +152,13 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
       printf("3. Accidente/choque\n");
       printf("-------------------------------------------\n");
       printf("4. Cancelar Solicitud\n");
-      printf("Opcion: ");
-      scanf("%d", &opcionSituacion);
-      if (opcionSituacion < 1 || opcionSituacion > 4) {
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
+      opcionSituacion = validarMenuGenerico(1, 4);
+      if (opcionSituacion==4){
+        (*cantCanceladas)++;
         system("cls");
-      } else   if (opcionSituacion==4){
-            (*cantCanceladas)++;
-            system("cls");
-            printf("La solicitud fue cancelada.\n");
-            return false;
-            }
-    } while (opcionSituacion < 1 || opcionSituacion > 4);
+        printf("La solicitud fue cancelada.\n");
+        return false;
+        }
     solicitudes[*cantSolicitudes].situacion = opcionSituacion;
 
     system("cls");
@@ -221,15 +202,8 @@ bool registrarSolicitud(int usuarioLogueado, solicitudes_t solicitudes[],
     printf("..............................................................\n");
     printf("1. Confirmar solicitud\n");
     printf("2. Cancelar solicitud\n");
-    printf("Opcion: ");
-    scanf("%d", &confirmar);
+    confirmar = validarMenuGenerico(1, 2);
     system("cls");
-
-    while (confirmar != 1 && confirmar != 2) {
-      printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-      printf("Opcion: ");
-      scanf("%d", &confirmar);
-    }
 
     if (confirmar == 1) {
       solicitudes[*cantSolicitudes].idCliente = usuarioLogueado;

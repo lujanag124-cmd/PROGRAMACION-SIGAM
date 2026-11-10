@@ -161,4 +161,6 @@ int cargarChoferes(chofer_t choferes[]);
 
 void guardarSolicitudes(solicitudes_t solicitudes[], int cantSolicitudes);
 int cargarSolicitudes(solicitudes_t solicitudes[]);
+
+int validarMenuGenerico(int minimo, int maximo);
 #endif
