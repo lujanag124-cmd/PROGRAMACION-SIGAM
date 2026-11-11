@@ -8,17 +8,17 @@
 int main() {
   // Declaracion de los vectores de las estructuras y credenciales hardcodeadas
   perfil_t perfiles[CANT_PERFILES] = {
-      {PERFIL_CHOFER, "Carlos", "Rodriguez", "chofer1", "chofer123", "Activo"},
-      {PERFIL_CHOFER, "Sandra", "Sanchez", "chofer2", "chofer123", "Activo"},
-      {PERFIL_CHOFER, "Pablo", "Escobar", "chofer3", "chofer123", "Suspendido"},
+      {PERFIL_CHOFER, "Carlos", "Rodriguez", "chofer1", "chofer123", "Activo",{"1134546786"}},
+      {PERFIL_CHOFER, "Sandra", "Sanchez", "chofer2", "chofer123", "Activo",{"1156917865"}},
+      {PERFIL_CHOFER, "Pablo", "Escobar", "chofer3", "chofer123", "Suspendido",{"1110203040"}},
 
-      {PERFIL_CLIENTE, "Tomas", "Escobar", "cliente1", "cliente123", "Activo"},
-      {PERFIL_CLIENTE, "Omar", "Gomez", "cliente2", "cliente123", "Activo"},
+      {PERFIL_CLIENTE, "Tomas", "Escobar", "cliente1", "cliente123", "Activo",{"1173633290"}},
+      {PERFIL_CLIENTE, "Omar", "Gomez", "cliente2", "cliente123", "Activo",{"1162583737"}},
       {PERFIL_CLIENTE, "Agustina", "Gonzalez", "cliente3", "cliente123",
-       "Activo"},
+       "Activo",{"1133012091"}},
 
-      {PERFIL_ADMIN, "Julian", "Alvarez", "admin1", "admin123", "Activo"},
-      {PERFIL_SOPORTE, "Lionel", "Messi", "soporte1", "soporte123", "Activo"}};
+      {PERFIL_ADMIN, "Julian", "Alvarez", "admin1", "admin123", "Activo",{"1119962000"}},
+      {PERFIL_SOPORTE, "Lionel", "Messi", "soporte1", "soporte123", "Activo",{"1132234334"}}};
 
   int cantidadPerfiles = cargarPerfiles(perfiles);
 

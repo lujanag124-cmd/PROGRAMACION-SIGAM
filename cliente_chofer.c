@@ -273,6 +273,7 @@ void consultaSolicitud(int usuarioLogueado, solicitudes_t solicitudes[], chofer_
         indiceChofer=solicitudes[i].choferAsignado;
         indicePerfil=choferes[indiceChofer].idPerfil;
         printf("Nombre y Apellido del chofer: %s %s\n",perfiles[indicePerfil].nombre, perfiles[indicePerfil].apellido);
+        printf("Telefono del chofer: %s\n",perfiles[indicePerfil].contacto.telefono);
         }
       }
     }
@@ -604,6 +605,7 @@ void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
       printf("Chofer con ID : %d\n", choferes[indiceChofer].idPerfil);
       printf("-------------------------------------------------------------\n");
       printf("Cliente: %s %s\n",perfiles[indiceCliente].nombre, perfiles[indiceCliente].apellido);
+      printf("Telefono del cliente: %s\n", perfiles[indiceCliente].contacto.telefono);
       printf("Ubicacion del cliente: %s\n",ubicaciones[solicitudes[indiceSolicitud].ubicacion - 1]);
       printf("El cliente tiene: %s\n", tiposVehiculos[solicitudes[indiceSolicitud].tipoVehiculo - 1]);
       printf("La patente del vehiculo es: %s\n",solicitudes[indiceSolicitud].patente);

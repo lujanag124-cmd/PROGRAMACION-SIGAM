@@ -10,13 +10,14 @@ void guardarPerfiles(perfil_t perfiles[]) {
         printf("Error al guardar los perfiles.\n");
     } else {
         for (int i = 0; i < CANT_PERFILES; i++) {
-            fprintf(archivo, "%d %s %s %s %s %s\n",
+            fprintf(archivo, "%d %s %s %s %s %s %s\n",
                     perfiles[i].tipoPerfil,
                     perfiles[i].nombre,
                     perfiles[i].apellido,
                     perfiles[i].usuario,
                     perfiles[i].clave,
-                    perfiles[i].estado);
+                    perfiles[i].estado,
+                    perfiles[i].contacto.telefono);
         }
         fclose(archivo);
     }
@@ -30,15 +31,16 @@ int cargarPerfiles(perfil_t perfiles[]) {
     if (archivo == NULL) {
         return 0;
     } else {
-        while (i < CANT_PERFILES && (fscanf(archivo, "%d %s %s %s %s %s",
-              &perfiles[i].tipoPerfil,
-              perfiles[i].nombre,
-              perfiles[i].apellido,
-              perfiles[i].usuario,
-              perfiles[i].clave,
-              perfiles[i].estado) == 6)) {
-    i++;
-}
+        while (i < CANT_PERFILES && fscanf(archivo, "%d %s %s %s %s %s %s",
+       &perfiles[i].tipoPerfil,
+       perfiles[i].nombre,
+       perfiles[i].apellido,
+       perfiles[i].usuario,
+       perfiles[i].clave,
+       perfiles[i].estado,
+       perfiles[i].contacto.telefono) == 7){
+        i++;
+        }   
         fclose(archivo);
     }
     return i;

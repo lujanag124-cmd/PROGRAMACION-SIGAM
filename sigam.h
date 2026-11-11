@@ -35,25 +35,6 @@
 #define CANT_RECLAMOS 10
 #define LOGIN_SUSPENDIDO -1  // identifica si es activo - suspendido
 
-/* Estrucuturas de los perfiles generales */
-typedef struct {
-  int tipoPerfil;
-  char nombre[TEXTO];
-  char apellido[TEXTO];
-  char usuario[TEXTO];
-  char clave[TEXTO];
-  char estado[TEXTO];
-} perfil_t;
-
-/* Estrucutura de los choferes */
-typedef struct {
-  int idPerfil;
-  int estado;
-  int ubicacion;
-  int tipoGrua;
-  int solicitudAsignada;
-} chofer_t;
-
 /* Estructura de la solicitud */
 typedef struct {
   int idCliente;
@@ -65,6 +46,31 @@ typedef struct {
   int choferAsignado;
   int prioridad;
 } solicitudes_t;
+
+/*Estructura de contacto para anidar*/
+typedef struct {
+    char telefono[TEXTO];
+} contacto_t;
+
+/* Estrucuturas de los perfiles generales */
+typedef struct {
+  int tipoPerfil;
+  char nombre[TEXTO];
+  char apellido[TEXTO];
+  char usuario[TEXTO];
+  char clave[TEXTO];
+  char estado[TEXTO];
+  contacto_t contacto;
+} perfil_t;
+
+/* Estrucutura de los choferes */
+typedef struct {
+  int idPerfil;
+  int estado;
+  int ubicacion;
+  int tipoGrua;
+  int solicitudAsignada;
+} chofer_t;
 
 /*SECCIÓN SOPORTE - Estructura para los reclamos */
 typedef struct {
