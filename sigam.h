@@ -84,7 +84,9 @@ typedef struct {
 
 /* Declaracion de los prototipos */
 void mostrarBienvenida(void);
+
 void inicioSesion(char usuario[], char password[]);
+
 int validaLogin(char usuario[], char password[], perfil_t perfiles[],
                 int* usuarioLogueado);
 
@@ -152,20 +154,26 @@ void menuSoporte(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
 void contactarSoporte(char tipoUsuarioActual[], reclamo_t reclamos[],
                       int* cantReclamos);
 void verReclamosPendientes(reclamo_t reclamos[], int cantReclamos);
+
 void gestionarEstadoUsuarios(perfil_t perfiles[]);
+
 void verHistorialReclamos(reclamo_t reclamos[], int cantReclamos);
+
 void hacerReclamo(int usuarioLogueado, reclamo_t reclamos[], int* cantReclamos,
                   perfil_t perfiles[]);
 int ingresarClave(char clave[], int tam);
 
 //funciones para persistencia de datos
 void guardarPerfiles(perfil_t perfiles[]);
+
 int cargarPerfiles(perfil_t perfiles[]);
 
 void guardarChoferes(chofer_t choferes[]);
+
 int cargarChoferes(chofer_t choferes[]);
 
 void guardarSolicitudes(solicitudes_t solicitudes[], int cantSolicitudes);
+
 int cargarSolicitudes(solicitudes_t solicitudes[]);
 
 int validarMenuGenerico(int minimo, int maximo);

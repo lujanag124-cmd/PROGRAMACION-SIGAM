@@ -30,7 +30,7 @@ void menuCliente(int usuarioLogueado, solicitudes_t solicitudes[],
     printf("0. Cerrar sesion\n");
     printf("----------------------------------------------------\n");
     printf("Seleccione una opcion: ");
-    scanf("%d", &opcion);
+    opcion = validarMenuGenerico(0, 3);
 
     switch (opcion) {
       case 1:
@@ -432,7 +432,7 @@ void menuChofer(int usuarioLogueado, chofer_t choferes[], solicitudes_t solicitu
     printf("4. Contactar a soporte\n");
     printf("0. Cerrar sesion\n");
     printf("Seleccione una opcion: ");
-    scanf("%d", &opcion);
+    opcion = validarMenuGenerico(0, 4);
 
     switch (opcion) {
       case 1:
@@ -509,71 +509,58 @@ void estadoActual(int usuarioLogueado, chofer_t choferes[],
   }
   printf("........................................................\n");
 
-  do {
+  
     printf("1. Cambiar de estado. \n");
     printf("2. Volver al menú principal\n");
-    scanf("%d", &opcionEstado);
-    if (opcionEstado > 2 || opcionEstado < 1) {
-      printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-      Sleep(3000);
-      system("cls");
-    }
-  } while (opcionEstado > 2 || opcionEstado < 1);
-
-  if (opcionEstado == 1) {
-    do {
-      system("cls");
-      printf("--------------------------------------\n");
-      printf("            CAMBIAR ESTADO            \n");
-      printf("--------------------------------------\n");
-      printf("1. Disponible\n");
-      printf("2. No disponible\n");
-      printf("3. Volver al menu principal\n");
-      printf("Ingrese una opción: ");
-      scanf("%d", &cambiarEstado);
-      if (cambiarEstado < 1 || cambiarEstado > 3) {
-        printf("Opcion incorrecta. Por favor, intente nuevamente.\n");
-        Sleep(3000);
+    opcionEstado = validarMenuGenerico(1, 2);
+    if (opcionEstado == 1) {
+  
         system("cls");
-      }
-    } while (cambiarEstado < 1 || cambiarEstado > 3);
+        printf("--------------------------------------\n");
+        printf("            CAMBIAR ESTADO            \n");
+        printf("--------------------------------------\n");
+        printf("1. Disponible\n");
+        printf("2. No disponible\n");
+        printf("3. Volver al menu principal\n");
+        printf("Ingrese una opción: ");
+        cambiarEstado = validarMenuGenerico(1, 3);
 
-    switch (cambiarEstado) {
-      case 1:
-        if (choferes[indiceChofer].solicitudAsignada != -1 ){
-          printf("Usted ya se encuentra con un servicio en curso\n");
-        } else if(estadosLocalidades[choferes[indiceChofer].ubicacion - 1] == 0) {
-          printf("No puede ponerse disponible.\n");
-          printf("Su localidad se encuentra suspendida.\n");
-        }else {
-          choferes[indiceChofer].estado = DISPONIBLE;
-          printf("El estado ha sido cambiado. Su estado actual es: Disponible.\n");
-          indicePendiente= buscarSolicitudPendiente(choferes, solicitudes, cantSolicitudes, indiceChofer);
-          if (indicePendiente != -1){
-            motorDeAsignacion(choferes, solicitudes, indiceChofer,indicePendiente,cantSolicitudes);
+      switch (cambiarEstado) {
+        case 1:
+          if (choferes[indiceChofer].solicitudAsignada != -1 ){
+            printf("Usted ya se encuentra con un servicio en curso\n");
+          } else if(estadosLocalidades[choferes[indiceChofer].ubicacion - 1] == 0) {
+            printf("No puede ponerse disponible.\n");
+            printf("Su localidad se encuentra suspendida.\n");
+          }else {
+            choferes[indiceChofer].estado = DISPONIBLE;
+            printf("El estado ha sido cambiado. Su estado actual es: Disponible.\n");
+            indicePendiente= buscarSolicitudPendiente(choferes, solicitudes, cantSolicitudes, indiceChofer);
+            if (indicePendiente != -1){
+              motorDeAsignacion(choferes, solicitudes, indiceChofer,indicePendiente,cantSolicitudes);
+            }
           }
-        }
-        break;
-      case 2:
-        if (choferes[indiceChofer].solicitudAsignada != -1 ){
-          printf("Usted ya se encuentra con un servicio en curso\n");
-        } else if (choferes[indiceChofer].estado == NO_DISPONIBLE) {
-          printf("Ya se encuentra en estado No Disponible.\n");
-        } else {
-          choferes[indiceChofer].estado = NO_DISPONIBLE;
-          printf(
-              "El estado ha sido cambiado. Su estado actual es: No "
-              "disponible.\n");
-        }
-        break;
-      case 3:
-        printf("Volviendo al menu anterior...\n");
-        Sleep(1500);
-        break;
+          break;
+        case 2:
+          if (choferes[indiceChofer].solicitudAsignada != -1 ){
+            printf("Usted ya se encuentra con un servicio en curso\n");
+          } else if (choferes[indiceChofer].estado == NO_DISPONIBLE) {
+            printf("Ya se encuentra en estado No Disponible.\n");
+          } else {
+            choferes[indiceChofer].estado = NO_DISPONIBLE;
+            printf(
+                "El estado ha sido cambiado. Su estado actual es: No "
+                "disponible.\n");
+          }
+          break;
+        case 3:
+          printf("Volviendo al menu anterior...\n");
+          Sleep(1500);
+          break;
+      }
+      guardarChoferes(choferes);
+      guardarSolicitudes(solicitudes, cantSolicitudes);
     }
-     guardarChoferes(choferes);
-     guardarSolicitudes(solicitudes, cantSolicitudes);
-  }
 }
 
 /* MENU CHOFER OPCION 2: SERVICIO ASIGNADO*/
@@ -613,12 +600,11 @@ void servicioAsignado(int usuarioLogueado, chofer_t choferes[],
       printf("Nivel de prioridad: ");
       mostrarPrioridad(solicitudes[indiceSolicitud].prioridad);
       printf("-------------------------------------------------------------\n");
-      do{
+      
       printf("1. Iniciar viaje\n");
       printf("2. volver al menu principal\n");
       printf("Ingrese una opción: ");
-      scanf("%d", &opcion);
-      }while (opcion > 2 || opcion <1);
+      opcion = validarMenuGenerico(1, 2);
       switch (opcion){
         case 1:
                 iniciarViaje(usuarioLogueado,choferes,solicitudes,cantSolicitudes);
